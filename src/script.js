@@ -159,9 +159,24 @@ function render() {
 
     gl.clearColor(0.125, 0.125, 0.118, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model[number]), gl.STATIC_DRAW);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices[number]), gl.STATIC_DRAW);
-    gl.drawElements(gl.TRIANGLES, indices[number].length, gl.UNSIGNED_SHORT, 0);
+
+    // buat bikin articulated model nya kalo udah semua hapus aja
+    if (number==0){
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model[number]), gl.STATIC_DRAW);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices[number]), gl.STATIC_DRAW);
+      gl.drawElements(gl.TRIANGLES, indices[number].length, gl.UNSIGNED_SHORT, 0);
+    }
+
+    if (number == 1) {
+      for (let i=0;i <model[number].length;i++){
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model[number][i].getVertices()), gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model[number][i].getIndices()), gl.STATIC_DRAW);
+        gl.drawElements(gl.TRIANGLES, model[number][i].getIndicesLength(), gl.UNSIGNED_SHORT, 0);
+      }
+      
+    }
+
+
     requestAnimationFrame(loop);
   }
   requestAnimationFrame(loop);
@@ -381,12 +396,9 @@ function loadModel(){
   reader.onload = function () {
     fileread = JSON.parse(reader.result);
     for (let i = 0; i < fileread.length; i++) {
-      model[1].push(...fileread[i]["vertices"])
-      // indices[3].push(...fileread["indices"])
+      model[1].push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"]))
     }
-    for (let i = 0; i < model[1].length; i += 4) {
-      indices[1].push(i, i + 1, i + 2, i + 3, i, i + 2)
-    }
+    console.log(model[1]);
   }
 
 

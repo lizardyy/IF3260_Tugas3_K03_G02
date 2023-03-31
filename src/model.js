@@ -51,7 +51,8 @@ var cubeVertices =
     ]
 
 var cubeIndices = []
-for(var i=0; i<cubeVertices.length; i+=4){
+
+for(var i=0; i<cubeVertices.length/6; i+=4){
     cubeIndices.push(i,i+1,i+2,i+3,i,i+2)
 }
 
