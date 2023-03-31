@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/bd3cec54b7.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>WEBGL 3D</title>
+</head>
+<body>
+        <html>
+        <script id="vertex-shader" type="x-shader/x-vertex">
+                precision mediump float;
+                attribute vec3 vPosition;
+                attribute vec3 vColor;
+                varying vec3 fColor;
+                uniform mat4 mWorld;
+                uniform mat4 mView;
+                uniform mat4 mProj;
+                void main(){
+                   fColor = vColor;
+                   gl_Position = mProj * mView * mWorld * vec4(vPosition, 1.0);
+                }
+        </script>
+        <script id="fragment-shader" type="x-shader/x-fragment">
+        
+                precision mediump float;
+                varying vec3 fColor;
+                void main(){
+                   gl_FragColor = vec4(fColor, 1.0);
+                }
+                </script>
+        
+        </html>
+    <div class="wrapper">
+        <h1 id="web_title">WEBGL 3D</h1>
+        <hr>
+        <div class="row" id="side-row">
+            <div class="col-center">
+                <p style="color: white; font-weight:500">Shading</p>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="shading" value="shading" checked>
+                    <span class="slider"></span>
+                </label>
+                <p style="color: white; font-weight:500">Animation</p>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="animation" value="animation" checked>
+                    <span class="slider"></span>
+                </label>
+                <button class="button_func shape active" id="set-cube" onclick="changeShape('cube')">
+                    <i class="fa-solid fa-cube" style="color:black"></i>
+                </button>
+                <br/>
+                <button class="button_func shape" id="set-triangularPrism" onclick="changeShape('triangular-prism')">
+                    <image src="https://cdn-icons-png.flaticon.com/512/1723/1723798.png" width="24px" style="background: none;"></image>
+                    
+                </button>
+                <br/>
+                <button class="button_func shape" id="set-squarePyramid" onclick="changeShape('square-pyramid')">
+                    <image src="https://cdn-icons-png.flaticon.com/512/3951/3951306.png" width="24px" style="background: none;"></image>
+                </button>
+                <br />
+                <button class="button_func shape" id="set-loadedModel" onclick=" changeShape('load')">
+                    <i class="fa-solid fa-upload"></i>
+                </button>
+            </div>
+            <canvas id="canvas" width="1200" height="600"></canvas>
+            <div class="col-center">
+                <div class="color">
+                    <p style="color: white; font-weight:500">Color</p>
+                    <input type="color" id="color-picker" name="color-picker" value="#331A66">
+                </div>
+                <button class="button_func text" id="reset-draw" onclick="resetCameraView()">Reset</button>
+                <button class="button_func text" id="upload-button">Upload</button>
+                <button class="button_func text" id="save-button" onclick="saveModel()">Save</button>
+                <input type="file" id="file-input" onchange="loadModel()" style="display:none">
+                <a class="helplink" href="help.html" target="_blank"><button class="button_func text" id="help-button" >Help</button></a>
+            </div>
+        </div>
+        <div class="row" id="full-row">
+            <button class="button_func" id="projection-btn" onclick="toggleDropdown('projection-form')">
+                <i class="fa-solid fa-video"></i>
+            </button>
+            <div class="dropdown" id="projection-form">
+                <div class="dropdown-content">
+                    <form>
+                        <input type="radio" id="orthographic" name="radio-group" onclick="changeProjection('orthographic')">
+                        <label for="orthographic" class="radio-label">Orthographic</label><br>     
+                        
+                        <input type="radio" id="oblique" name="radio-group" onclick="changeProjection('oblique')">
+                        <label for="oblique" class="radio-label">Oblique</label><br>     
+
+                        <input type="radio" id="perspective" name="radio-group" onclick="changeProjection('perspective')">
+                        <label for="perspective" class="radio-label">Perspective</label>    
+                    </form>
+                </div>
+            </div>
+
+            <button class="button_func" id="rotate-btn" onclick="toggleDropdown('rotate-form')">
+                <i class="fa-solid fa-rotate"></i>
+            </button>
+            <div class="dropdown" id="rotate-form">
+                <div class="dropdown-content">
+                    <form>
+                        <label for="x-rotate">X Rotation:</label>
+                        <p class="range-value" id="x-rotation-value">0°</p>
+                        <input type="range" id="x-rotation" name="x-rotation" min="0" max="360" value="0" oninput="rotateModel(0,this.value)" required >
+                        <br>
+                        
+                        <label for="y-rotate">Y Rotation:</label>
+                        <p class="range-value" id="y-rotation-value">0°</p>
+                        <input type="range" id="y-rotation" name="y-rotation" min="0" max="360" value="0" oninput="rotateModel(1,this.value)" required>
+                        <br>
+
+                        <label for="z-rotate">Z Rotation:</label>
+                        <p class="range-value" id="z-rotation-value">0°</p>
+                        <input type="range" id="z-rotation" name="z-rotation" min="0" max="360" value="0"  oninput="rotateModel(2,this.value)" required>
+                    </form>
+                </div>
+            </div>
+
+            <button class="button_func" id="scale-btn" onclick="toggleDropdown('scale-form')">
+                <i class="fa-solid fa-arrows-left-right"></i>
+            </button>
+            <div class="dropdown" id="scale-form">
+                <div class="dropdown-content">
+                    <form>
+                        <label for="x-scale">X Scale:</label>
+                        <p class="range-value" id="x-scale-value">1</p>
+                        <input type="range" id="x-scale" name="x-scale" min="0" max="2" step="0.05" value="1" oninput="scaleModel(0,this.value)" required>
+                        <br>
+                        
+                        <label for="y-scale">Y Scale:</label>
+                        <p class="range-value" id="y-scale-value">1</p>
+                        <input type="range" id="y-scale" name="y-scale" min="0" max="2" step="0.05" value="1" oninput="scaleModel(1,this.value)" required>
+                        <br>
+
+                        <label for="z-scale">Z Scale:</label>
+                        <p class="range-value" id="z-scale-value">1</p>
+                        <input type="range" id="z-scale" name="z-scale" min="0" max="2" step="0.05" value="1" oninput="scaleModel(2,this.value)" required>
+                    </form>
+                </div>
+            </div>
+
+            <button class="button_func" id="translate-btn" onclick="toggleDropdown('translate-form')">
+                <i class="fa-solid fa-up-down-left-right"></i>
+            </button>
+            <div class="dropdown" id="translate-form">
+                <div class="dropdown-content">
+                    <form>
+                        <label for="x-translate">X Translation:</label>
+                        <p class="range-value" id="x-translate-value">0</p>
+                        <input type="range" id="x-translate" name="x-translate" min="-2" max="2" step="0.05" value="0" oninput="translateModel(0,this.value)" required>
+                        <br>
+                        
+                        <label for="y-translate">Y Translation:</label>
+                        <p class="range-value" id="y-translate-value">0</p>
+                        <input type="range" id="y-translate" name="y-translate" min="-2" max="2" step="0.05" value="0" oninput="translateModel(1,this.value)" required>
+                        <br>
+
+                        <label for="z-translate">Z Translation:</label>
+                        <p class="range-value" id="z-translate-value">0</p>
+                        <input type="range" id="z-translate" name="z-translate" min="-2" max="2" step="0.05" value="0" oninput="translateModel(2,this.value)" required>
+                    </form>
+                </div>
+            </div>
+
+            <button class="button_func" id="camera-btn" onclick="toggleDropdown('camera-form')">
+                <i class="fa-solid fa-camera"></i>
+            </button>
+            <div class="dropdown" id="camera-form">
+                <div class="dropdown-content">
+                    <form>
+                        <label for="angle-camera">Angle:</label>
+                        <p class="range-value" id="angle-camera-value">0°</p>
+                        <input type="range" id="angle-camera" name="angle-camera" min="0" max="360" value="0" oninput="changeAngle(this.value)" required>
+                        <br>
+                        
+                        <label for="radius-camera">Radius:</label>
+                        <p class="range-value" id="radius-camera-value">5</p>
+                        <input type="range" id="radius-camera" name="radius-camera" min="0" max="105" step="0.05" value="5" oninput="changeRadius(this.value)" required>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script type="text/javascript" src="matrix.js"></script>
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="model.js"></script>
+    <script type="text/javascript" src="transformation.js"></script>
+    <script type="text/javascript" src="script.js"></script>
+</body>
+</html>
