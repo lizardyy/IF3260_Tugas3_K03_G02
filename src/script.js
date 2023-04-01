@@ -369,8 +369,8 @@ function loadModel(){
     for (let i = 0; i < fileread.length; i++) {
       model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"]))
     }
-    console.log(model);
     genereteTree()
+    generateComponentControl()
   }
 }
 
@@ -378,6 +378,14 @@ function genereteTree(){
   let inner =""
   for (let i = 0; i <model.length;i++){
     inner +='<button style="color: white;">'+ model[i].getName() + '</button>'
+    inner +='<br>'
   }
   document.getElementById("component-tree").innerHTML =inner
+}
+
+function generateComponentControl(){
+  let inner = ""
+  inner += '<label for="x-translate" style="color: white;">X Translation:</label><p class="range-value" id = "x-translate-value" > 0</p ><input type="range" id="x-translate" name="x-translate" min="-2" max="2" step="0.05" value="0" oninput="translateModel(0,this.value)" required><br>'
+  document.getElementById("component-control").innerHTML = inner
+ 
 }
