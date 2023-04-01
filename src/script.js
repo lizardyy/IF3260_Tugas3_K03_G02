@@ -131,6 +131,7 @@ window.onload = function init() {
 
   defaultState();
   stopAnimation();
+  genereteTree()
   render();
 }
 
@@ -138,7 +139,6 @@ window.onload = function init() {
 function render() {
   mIdentity = new Float32Array(16);
   identity(mIdentity);
-  gl.drawElements(gl.TRIANGLES, indices[0].length, gl.UNSIGNED_SHORT, 0);
   var loop = () => {
     if (animation){
       rotAngle[0] += (1/1800 * Math.PI);
@@ -160,19 +160,11 @@ function render() {
     gl.clearColor(0.125, 0.125, 0.118, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    // buat bikin articulated model nya kalo udah semua hapus aja
-    if (number==0){
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model[number]), gl.STATIC_DRAW);
-      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices[number]), gl.STATIC_DRAW);
-      gl.drawElements(gl.TRIANGLES, indices[number].length, gl.UNSIGNED_SHORT, 0);
-    }
 
-    if (number == 1) {
-      for (let i=0;i <model[number].length;i++){
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model[number][i].getVertices()), gl.STATIC_DRAW);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model[number][i].getIndices()), gl.STATIC_DRAW);
-        gl.drawElements(gl.TRIANGLES, model[number][i].getIndicesLength(), gl.UNSIGNED_SHORT, 0);
-      }
+      for (let i=0;i <model.length;i++){
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model[i].getVertices()), gl.STATIC_DRAW);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model[i].getIndices()), gl.STATIC_DRAW);
+        gl.drawElements(gl.TRIANGLES, model[i].getIndicesLength(), gl.UNSIGNED_SHORT, 0);
       
     }
 
@@ -343,27 +335,7 @@ function changeProjection(type){
 }
 
 function saveModel(){
-  const verticesModel = model[number]
-  const indicesModel = indices[number]
-  var result =[];
-  for (let i = 0; i < verticesModel.length;i+=6){
-    result.push(...multVerticesTransformMatrix(verticesModel.slice(i,i+6),worldMatrix))
-  }
-  const jsonObj = {
-    vertices: result,
-    indices: indicesModel
-  };
-  const jsonFile = JSON.parse(JSON.stringify(jsonObj));
 
-  const downloadFile = document.createElement("a");
-  downloadFile.href = URL.createObjectURL(new Blob([JSON.stringify(jsonFile, null, 2)], {
-    type: "text/plain"
-  }));
-  downloadFile.setAttribute("download", "Model.json");
-  document.body.appendChild(downloadFile);
-  downloadFile.click();
-  document.body.removeChild(downloadFile);
-  
 }
 
 function multVerticesTransformMatrix(vertices,transformMatrix) {
@@ -391,15 +363,21 @@ function loadModel(){
   let reader = new FileReader();
 
   reader.readAsText(file);
-  model[1] =[]
-  indices[1] =[]
+  model =[]
   reader.onload = function () {
     fileread = JSON.parse(reader.result);
     for (let i = 0; i < fileread.length; i++) {
-      model[1].push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"]))
+      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"]))
     }
-    console.log(model[1]);
+    console.log(model);
+    genereteTree()
   }
+}
 
-
+function genereteTree(){
+  let inner =""
+  for (let i = 0; i <model.length;i++){
+    inner +='<button style="color: white;">'+ model[i].getName() + '</button>'
+  }
+  document.getElementById("component-tree").innerHTML =inner
 }

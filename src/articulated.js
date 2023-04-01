@@ -13,4 +13,6 @@ class Articulated {
     getIndices() { return this.indices; }
 
     getIndicesLength() { return this.indices.length; }
+
+    getName() { return this.name; }
 }
