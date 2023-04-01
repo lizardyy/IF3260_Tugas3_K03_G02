@@ -6,6 +6,7 @@ var matProjLocation
 var viewMatrix
 var projMatrix
 var mIdentity
+var transformMatrixComponent
 
 var rotAngle = [0,0,0]
 var translation = [0,0,0];
@@ -17,6 +18,7 @@ var color = [0.2 ,0.1 , 0.4];
 var animation = false;
 var number = 0;
 var shading = true;
+var selectedComponent =-1;
 
 
 /* Dropdown Handler */
@@ -131,7 +133,6 @@ window.onload = function init() {
 
   defaultState();
   stopAnimation();
-  genereteTree()
   render();
 }
 
@@ -146,14 +147,30 @@ function render() {
       rotAngle[2] += (1/1800 * Math.PI);
     } 
 
-    worldMatrix = transformMatrix.projection(2,2,2)
-    worldMatrix = transformMatrix.translate(worldMatrix, translation[0], translation[1], translation[2]);
-    worldMatrix = transformMatrix.xRotate(worldMatrix, rotAngle[0]);
-    worldMatrix = transformMatrix.yRotate(worldMatrix, rotAngle[1]);
-    worldMatrix = transformMatrix.zRotate(worldMatrix, rotAngle[2]);
-    worldMatrix = transformMatrix.scale(worldMatrix, scale[0], scale[1], scale[2]);
+    if (selectedComponent ==-1){
+      worldMatrix = transformMatrix.projection(2, 2, 2)
+      worldMatrix = transformMatrix.translate(worldMatrix, translation[0], translation[1], translation[2]);
+      worldMatrix = transformMatrix.xRotate(worldMatrix, rotAngle[0]);
+      worldMatrix = transformMatrix.yRotate(worldMatrix, rotAngle[1]);
+      worldMatrix = transformMatrix.zRotate(worldMatrix, rotAngle[2]);
+      worldMatrix = transformMatrix.scale(worldMatrix, scale[0], scale[1], scale[2]);
+    }
+    else{
+      transformMatrixComponent = model[selectedComponent].getTransformMatrix()
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, translation[0], translation[1], translation[2]);
+      transformMatrixComponent = transformMatrix.xRotate(transformMatrixComponent, rotAngle[0]);
+      transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, rotAngle[1]);
+      transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, rotAngle[2]);
+      transformMatrixComponent = transformMatrix.scale(transformMatrixComponent, scale[0], scale[1], scale[2]);
+    }
 
-    gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
+
+    if (selectedComponent== -1){
+      gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
+    }
+    else{
+     
+    }
     gl.uniformMatrix4fv(matViewLocation, gl.FALSE, viewMatrix);
     gl.uniformMatrix4fv(matProjLocation, gl.FALSE, projMatrix);
 
@@ -161,8 +178,12 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
 
-      for (let i=0;i <model.length;i++){
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(model[i].getVertices()), gl.STATIC_DRAW);
+    for (let i=0;i <model.length;i++){
+      if (i == selectedComponent){
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), transformMatrixComponent)), gl.STATIC_DRAW);
+      }else{  
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), model[i].getTransformMatrix())), gl.STATIC_DRAW);
+      }
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model[i].getIndices()), gl.STATIC_DRAW);
         gl.drawElements(gl.TRIANGLES, model[i].getIndicesLength(), gl.UNSIGNED_SHORT, 0);
       
@@ -338,7 +359,15 @@ function saveModel(){
 
 }
 
+function mult(verticesModel, worldMatrix){
+  const result = []
+  for (let i = 0; i < verticesModel.length; i += 6) {
+    result.push(...multVerticesTransformMatrix(verticesModel.slice(i, i + 6), worldMatrix))
+  }
+  return result
+}
 function multVerticesTransformMatrix(vertices,transformMatrix) {
+  
   const vert = vertices.slice(0,3)
   vert.push(1.0);
   const out = []
@@ -367,25 +396,27 @@ function loadModel(){
   reader.onload = function () {
     fileread = JSON.parse(reader.result);
     for (let i = 0; i < fileread.length; i++) {
-      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"]))
+      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], worldMatrix))
+
     }
     genereteTree()
-    generateComponentControl()
+
   }
 }
 
 function genereteTree(){
-  let inner =""
+  let inner = '<button onclick="selectComponent(' + -1 + ')" style="color: white;">root</button><br>'
+
   for (let i = 0; i <model.length;i++){
-    inner +='<button style="color: white;">'+ model[i].getName() + '</button>'
+    inner +='<button onclick="selectComponent('+i+')" style="color: white;">'+ model[i].getName() + '</button>'
     inner +='<br>'
   }
   document.getElementById("component-tree").innerHTML =inner
 }
 
-function generateComponentControl(){
-  let inner = ""
-  inner += '<label for="x-translate" style="color: white;">X Translation:</label><p class="range-value" id = "x-translate-value" > 0</p ><input type="range" id="x-translate" name="x-translate" min="-2" max="2" step="0.05" value="0" oninput="translateModel(0,this.value)" required><br>'
-  document.getElementById("component-control").innerHTML = inner
- 
+function selectComponent(idx){
+  if (selectedComponent!=-1){
+    model[selectedComponent].setTransformMatrix(transformMatrixComponent)
+  }
+  selectedComponent = idx
 }
