@@ -207,19 +207,6 @@ const hexToRgb = (hex) => {
   return [r, g, b];
 }
 
-
-function changeShape(model){
-  if (model=='cube'){
-    number = 0;
-  } else if (model=='triangular-prism'){
-    number = 1;
-  } else if (model=='square-pyramid'){
-    number = 2;
-  } else{
-    number = 3;
-  }
-}
-
 function shaderModel(color){
   let r = color[0]
   let g = color[1]
@@ -355,10 +342,6 @@ function changeProjection(type){
   }
 }
 
-function saveModel(){
-
-}
-
 function mult(verticesModel, worldMatrix){
   const result = []
   for (let i = 0; i < verticesModel.length; i += 6) {
@@ -366,6 +349,7 @@ function mult(verticesModel, worldMatrix){
   }
   return result
 }
+
 function multVerticesTransformMatrix(vertices,transformMatrix) {
   
   const vert = vertices.slice(0,3)
@@ -397,14 +381,56 @@ function loadModel(){
     fileread = JSON.parse(reader.result);
     for (let i = 0; i < fileread.length; i++) {
       model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], worldMatrix))
-
     }
-    genereteTree()
-
+    generateTree()
   }
 }
 
-function genereteTree(){
+function saveModel() {
+  // for (let i = 0; i < model.length; i++) {
+  //   if (i == selectedComponent){
+  //     model[i].vertices = mult(model[i].getVertices(), transformMatrixComponent)
+  //   } else {
+  //     model[i].vertices = mult(model[i].getVertices(), model[i].getTransformMatrix())
+  //   }
+  // }
+
+  // const modelJSON = JSON.stringify(model.map(articulated => ({
+  //   name: articulated.name,
+  //   vertices: articulated.vertices,
+  //   indices: articulated.indices,
+  // })));
+
+  const transformedModel = model.map((articulated, i) => {
+    if (i === selectedComponent) {
+      return {
+        name: articulated.name,
+        vertices: mult(articulated.getVertices(), transformMatrixComponent),
+        indices: articulated.indices,
+      };
+    } else {
+      return {
+        name: articulated.name,
+        vertices: mult(articulated.getVertices(), articulated.getTransformMatrix()),
+        indices: articulated.indices,
+      };
+    }
+  });
+
+  const modelJSON = JSON.stringify(transformedModel);
+
+  const blob = new Blob([modelJSON], { type: "application/json" });
+
+  const url = URL.createObjectURL(blob);
+  const downloadFile = document.createElement("a");
+  downloadFile.href = url;
+  downloadFile.setAttribute("download", "model.json");
+  document.body.appendChild(downloadFile);
+  downloadFile.click();
+  document.body.removeChild(downloadFile);
+}
+
+function generateTree(){
   let inner = '<button onclick="selectComponent(' + -1 + ')" style="color: white;">root</button><br>'
 
   for (let i = 0; i <model.length;i++){
