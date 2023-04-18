@@ -1,6 +1,6 @@
 [
 	{
-		"name": "body",
+		"name": "Body",
 		"vertices": [
 			-1,
 			1,
@@ -184,10 +184,12 @@
 			23,
 			20,
 			22
-		]
+		],
+		"rotationLimit": [-10, 10],
+		"rotationAngle": 0
 	},
 	{
-		"name": "head",
+		"name": "Head",
 		"vertices": [
 			-1,
 			1.2,
@@ -371,10 +373,12 @@
 			23,
 			20,
 			22
-		]
+		],
+		"rotationLimit": [-10, 10],
+		"rotationAngle": 0
 	},
 	{
-		"name": "left front leg",
+		"name": "Left Front Leg",
 		"vertices": [
 			-1.025,
 			0,
@@ -558,10 +562,12 @@
 			23,
 			20,
 			22
-		]
+		],
+		"rotationLimit": [-10, 10],
+		"rotationAngle": 0
 	},
 	{
-		"name": "right front leg",
+		"name": "Right Front Leg",
 		"vertices": [
 			0.2750000000000001,
 			0,
@@ -697,10 +703,12 @@
 			23,
 			20,
 			22
-		]
+		],
+		"rotationLimit": [-10, 10],
+		"rotationAngle": 0
 	},
 	{
-		"name": "left back leg",
+		"name": "Left Back Leg",
 		"vertices": [
 			0.275,
 			0,
@@ -836,10 +844,12 @@
 			23,
 			20,
 			22
-		]
+		],
+		"rotationLimit": [-10, 10],
+		"rotationAngle": 0
 	},
 	{
-		"name": "right back leg",
+		"name": "Right Back Leg",
 		"vertices": [
 			-1.025,
 			0,
@@ -975,10 +985,12 @@
 			23,
 			20,
 			22
-		]
+		],
+		"rotationLimit": [-10, 10],
+		"rotationAngle": 0
 	},
 	{
-		"name": "nose",
+		"name": "Nose",
 		"vertices": [
 			-0.3,
 			0.22499999999999998,
@@ -1114,6 +1126,8 @@
 			23,
 			20,
 			22
-		]
+		],
+		"rotationLimit": [-10, 10],
+		"rotationAngle": 0
 	}
 ]

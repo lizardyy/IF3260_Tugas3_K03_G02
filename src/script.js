@@ -15,7 +15,6 @@ var translation = [0,0,0];
 var scale = [1, 1, 1];
 var camAngle = 0;
 var camRadius = 5;
-var rotated = [0,0,0];
 var color = [0.2 ,0.1 , 0.4];
 var animation = false;
 var number = 0;
@@ -41,6 +40,7 @@ const inputs = [
   {input: document.getElementById('x-rotation'), value: document.getElementById('x-rotation-value'), unit: '°'},
   {input: document.getElementById('y-rotation'), value: document.getElementById('y-rotation-value'), unit: '°'},
   {input: document.getElementById('z-rotation'), value: document.getElementById('z-rotation-value'), unit: '°'},
+  {input: document.getElementById('part-rotation'), value: document.getElementById('part-rotation-value'), unit: '°'},
   {input: document.getElementById('x-scale'), value: document.getElementById('x-scale-value'), unit: ''},
   {input: document.getElementById('y-scale'), value: document.getElementById('y-scale-value'), unit: ''},
   {input: document.getElementById('z-scale'), value: document.getElementById('z-scale-value'), unit: ''},
@@ -70,12 +70,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 /* Default State */
 function defaultState() {
-  rotAngle = [0,0,0];
+  rotAngle = [0,0,0,0];
   translation = [0,0,0];
   scale = [1, 1, 1];
   camAngle = 0; 
   camRadius = 5;
-  rotated = [0,0,0];
   color = [0.2 ,0.1 , 0.4];
   animation = false;
   number = 0;
@@ -154,30 +153,22 @@ function render() {
       rotAngle[2] += (1/1800 * Math.PI);
     } 
 
-    if (selectedComponent ==-1){
-      worldMatrix = transformMatrix.projection(2, 2, 2)
-      worldMatrix = transformMatrix.translate(worldMatrix, translation[0], translation[1], translation[2]);
-      worldMatrix = transformMatrix.xRotate(worldMatrix, rotAngle[0]);
-      worldMatrix = transformMatrix.yRotate(worldMatrix, rotAngle[1]);
-      worldMatrix = transformMatrix.zRotate(worldMatrix, rotAngle[2]);
-      worldMatrix = transformMatrix.scale(worldMatrix, scale[0], scale[1], scale[2]);
-    }
-    else{
+    worldMatrix = transformMatrix.projection(2, 2, 2)
+    worldMatrix = transformMatrix.translate(worldMatrix, translation[0], translation[1], translation[2]);
+    worldMatrix = transformMatrix.xRotate(worldMatrix, rotAngle[0]);
+    worldMatrix = transformMatrix.yRotate(worldMatrix, rotAngle[1]);
+    worldMatrix = transformMatrix.zRotate(worldMatrix, rotAngle[2]);
+    worldMatrix = transformMatrix.scale(worldMatrix, scale[0], scale[1], scale[2]);
+    if (selectedComponent != -1){
       transformMatrixComponent = model[selectedComponent].getTransformMatrix()
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, translation[0], translation[1], translation[2]);
-      transformMatrixComponent = transformMatrix.xRotate(transformMatrixComponent, rotAngle[0]);
-      transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, rotAngle[1]);
-      transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, rotAngle[2]);
-      transformMatrixComponent = transformMatrix.scale(transformMatrixComponent, scale[0], scale[1], scale[2]);
+      // transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, translation[0], translation[1], translation[2]);
+      // transformMatrixComponent = transformMatrix.xRotate(transformMatrixComponent, rotAngle[0]);
+      transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
+      // transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, rotAngle[2]);
+      // transformMatrixComponent = transformMatrix.scale(transformMatrixComponent, scale[0], scale[1], scale[2]);
     }
 
-
-    if (selectedComponent== -1){
-      gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
-    }
-    else{
-     
-    }
+    gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
     gl.uniformMatrix4fv(matViewLocation, gl.FALSE, viewMatrix);
     gl.uniformMatrix4fv(matProjLocation, gl.FALSE, projMatrix);
     gl.uniform1i(shadingLocation, shading);
@@ -189,11 +180,11 @@ function render() {
     for (let i=0;i <model.length;i++){
       if (i == selectedComponent){
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), transformMatrixComponent)), gl.STATIC_DRAW);
-      }else{  
+      } else {  
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), model[i].getTransformMatrix())), gl.STATIC_DRAW);
       }
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model[i].getIndices()), gl.STATIC_DRAW);
-        gl.drawElements(gl.TRIANGLES, model[i].getIndicesLength(), gl.UNSIGNED_SHORT, 0);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model[i].getIndices()), gl.STATIC_DRAW);
+      gl.drawElements(gl.TRIANGLES, model[i].getIndicesLength(), gl.UNSIGNED_SHORT, 0);
     }
 
 
@@ -273,8 +264,12 @@ document.getElementById("color-picker").addEventListener('input', changeColor, f
 
 function rotateModel(id, angle) {
   stopAnimation()
-  rotAngle[id] = toRadian(angle)
-  rotated = rotAngle;
+  if (id != 3){
+    rotAngle[id] = toRadian(angle)
+  } else {
+    model[selectedComponent].setRotationAngle(toRadian(angle))
+    console.log(model[selectedComponent].getRotationAngle())
+  }
 }
 
 function translateModel(id, value) {
@@ -387,39 +382,38 @@ function loadModel(){
   reader.onload = function () {
     fileread = JSON.parse(reader.result);
     for (let i = 0; i < fileread.length; i++) {
-      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], worldMatrix))
+      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], fileread[i]["rotationLimit"], fileread[i]["rotationAngle"], worldMatrix))
     }
     generateTree()
   }
+
+  const label = document.getElementById('part-rotate-label')
+  const value = document.getElementById('part-rotation-value');
+  const input = document.getElementById('part-rotation');
+  label.style.display = 'none';
+  value.style.display = 'none';
+  input.style.display = 'none';
+
+  resetCameraView()
 }
 
 function saveModel() {
-  // for (let i = 0; i < model.length; i++) {
-  //   if (i == selectedComponent){
-  //     model[i].vertices = mult(model[i].getVertices(), transformMatrixComponent)
-  //   } else {
-  //     model[i].vertices = mult(model[i].getVertices(), model[i].getTransformMatrix())
-  //   }
-  // }
-
-  // const modelJSON = JSON.stringify(model.map(articulated => ({
-  //   name: articulated.name,
-  //   vertices: articulated.vertices,
-  //   indices: articulated.indices,
-  // })));
-
   const transformedModel = model.map((articulated, i) => {
     if (i === selectedComponent) {
       return {
         name: articulated.name,
         vertices: mult(articulated.getVertices(), transformMatrixComponent),
         indices: articulated.indices,
+        rotationLimit: articulated.rotationLimit,
+        rotationAngle: articulated.getRotationAngle(),
       };
     } else {
       return {
         name: articulated.name,
         vertices: mult(articulated.getVertices(), articulated.getTransformMatrix()),
         indices: articulated.indices,
+        rotationLimit: articulated.rotationLimit,
+        rotationAngle: articulated.getRotationAngle(),
       };
     }
   });
@@ -437,19 +431,56 @@ function saveModel() {
   document.body.removeChild(downloadFile);
 }
 
-function generateTree(){
-  let inner = '<button onclick="selectComponent(' + -1 + ')" style="color: white;">root</button><br>'
 
-  for (let i = 0; i <model.length;i++){
-    inner +='<button onclick="selectComponent('+i+')" style="color: white;">'+ model[i].getName() + '</button>'
-    inner +='<br>'
+
+function generateTree(){
+  let inner = '<input type="radio" id="component--1" name="component" onclick="selectComponent(' + -1 + ')" style="display: none;">';
+  inner += '<label for="component--1" class="radio-label"">Root</label><br>';
+
+  for (let i = 0; i < model.length; i++) {
+    inner += '<input type="radio" id="component-' + i + '" name="component" onclick="selectComponent(' + i + ')" style="display: none;">';
+    inner += '<label for="component-' + i + '" class="radio-label">' + model[i].getName() + '</label><br>';
   }
-  document.getElementById("component-tree").innerHTML =inner
+
+  document.getElementById("component-tree").innerHTML = inner;
+  document.getElementById("component--1").checked = true;
 }
 
-function selectComponent(idx){
-  if (selectedComponent!=-1){
-    model[selectedComponent].setTransformMatrix(transformMatrixComponent)
+
+function selectComponent(idx) {
+  const label = document.getElementById('part-rotate-label');
+  const value = document.getElementById('part-rotation-value');
+  const input = document.getElementById('part-rotation');
+
+  if (selectedComponent != -1) {
+    // update the current selected component
+    const partRotation = document.getElementById('part-rotation');
+    const rotationLimit = model[selectedComponent].getRotationLimit();
+
+    model[selectedComponent].setTransformMatrix(transformMatrixComponent);
+
+    label.style.display = 'inline';
+    value.style.display = 'inline';
+    input.style.display = 'inline';
+
+    label.textContent = model[selectedComponent].getName() + ' Rotation:';
+    partRotation.value = model[selectedComponent].getRotationAngle() * 180 / Math.PI
+    console.log(partRotation.value);
+    value.innerText = partRotation.value + '°';
+    partRotation.min = rotationLimit[0];
+    partRotation.max = rotationLimit[1];
+
+    console.log(model[selectedComponent].getName());
+    console.log(partRotation.min);
+  } else {
+    label.style.display = 'none';
+    value.style.display = 'none';
+    input.style.display = 'none';
   }
-  selectedComponent = idx
+
+  // update the selected component after a delay of 0ms
+  setTimeout(function() {
+    console.log(idx);
+    selectedComponent = idx;
+  }, 0);
 }

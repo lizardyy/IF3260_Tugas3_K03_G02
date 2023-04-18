@@ -115,7 +115,7 @@ hr {
     padding: 1rem;
     background-color: white;
     color: #000;
-    min-width: 200px;
+    min-width: 220px;
     bottom: 60px;
     left: -50px;
   }
@@ -268,4 +268,15 @@ input[type="color"]::-webkit-color-swatch {
 
 .button_func.button_func.active .fa-solid {
   background-color: #2196F3;
+}
+
+/* COMPONENT TREE */
+#component-tree {
+  margin: 0;
+  background-color: white;
+}
+
+#component-tree .radio-label {
+  background-color: white;
+  color: #000;
 }
