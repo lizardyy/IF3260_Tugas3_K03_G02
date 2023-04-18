@@ -18,9 +18,18 @@
                 uniform mat4 mWorld;
                 uniform mat4 mView;
                 uniform mat4 mProj;
+                uniform vec3 uLightDirection;
+
+                uniform bool shading;
                 void main(){
-                   fColor = vColor;
-                   gl_Position = mProj * mView * mWorld * vec4(vPosition, 1.0);
+                    float intensity = max(dot(normalize(vPosition), uLightDirection), 0.0);
+                    if(shading) {
+                        fColor = vec3(vColor.rgb * intensity);
+                    }
+                    else {
+                        fColor = vec3(vColor.rgb);
+                    }
+                    gl_Position = mProj * mView * mWorld * vec4(vPosition, 1.0);
                 }
         </script>
         <script id="fragment-shader" type="x-shader/x-fragment">
@@ -28,7 +37,7 @@
                 precision mediump float;
                 varying vec3 fColor;
                 void main(){
-                   gl_FragColor = vec4(fColor, 1.0);
+                    gl_FragColor = vec4(fColor.rgb, 1.0);
                 }
                 </script>
         
