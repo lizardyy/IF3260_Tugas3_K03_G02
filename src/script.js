@@ -3,6 +3,8 @@ var worldMatrix
 var matWorldLocation
 var matViewLocation
 var matProjLocation
+var lightDirectionLocation
+var shadingLocation
 var viewMatrix
 var projMatrix
 var mIdentity
@@ -111,6 +113,8 @@ window.onload = function init() {
   matWorldLocation = gl.getUniformLocation(program, 'mWorld');
   matViewLocation = gl.getUniformLocation(program, 'mView');
   matProjLocation = gl.getUniformLocation(program, 'mProj');
+  lightDirectionLocation = gl.getUniformLocation(program, 'uLightDirection');
+  shadingLocation = gl.getUniformLocation(program, 'shading');
 
   // worldMatrix = new Float32Array(16);
   viewMatrix = new Float32Array(16);
@@ -121,6 +125,9 @@ window.onload = function init() {
 
   gl.uniformMatrix4fv(matViewLocation, gl.FALSE, viewMatrix);
   gl.uniformMatrix4fv(matProjLocation, gl.FALSE, projMatrix);
+
+  const lightDirection = [1, 1, 1]
+  gl.uniform3fv(lightDirectionLocation, lightDirection);
 
 /* Shape Button Handler */
   const buttons = document.querySelectorAll('.shape');
@@ -173,6 +180,7 @@ function render() {
     }
     gl.uniformMatrix4fv(matViewLocation, gl.FALSE, viewMatrix);
     gl.uniformMatrix4fv(matProjLocation, gl.FALSE, projMatrix);
+    gl.uniform1i(shadingLocation, shading);
 
     gl.clearColor(0.125, 0.125, 0.118, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
