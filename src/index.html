@@ -15,12 +15,18 @@
                 attribute vec3 vPosition;
                 attribute vec3 vColor;
                 varying vec3 fColor;
+
                 uniform mat4 mWorld;
                 uniform mat4 mView;
                 uniform mat4 mProj;
+
                 uniform vec3 uLightDirection;
+                varying vec3 vNormal;
 
                 uniform bool shading;
+                uniform bool customMapping;
+                uniform bool bumpMapping;
+                uniform bool reflectiveMapping;
                 void main(){
                     float intensity = max(dot(normalize(vPosition), uLightDirection), 0.0);
                     if(shading) {
@@ -30,14 +36,34 @@
                         fColor = vec3(vColor.rgb);
                     }
                     gl_Position = mProj * mView * mWorld * vec4(vPosition, 1.0);
+                    vNormal = normalize(vPosition.xyz);
                 }
         </script>
         <script id="fragment-shader" type="x-shader/x-fragment">
         
                 precision mediump float;
                 varying vec3 fColor;
+                varying vec3 vNormal;
+                uniform samplerCube uTexture;
+
+                uniform bool shading;
+                uniform bool customMapping;
+                uniform bool bumpMapping;
+                uniform bool reflectiveMapping;
                 void main(){
-                    gl_FragColor = vec4(fColor.rgb, 1.0);
+                    if(customMapping) {
+                        gl_FragColor = textureCube(uTexture, normalize(vNormal));
+                    }
+                    else if(bumpMapping) {
+                        
+                    }
+                    else if(reflectiveMapping) {
+                        
+                    }
+                    else {
+                        gl_FragColor = vec4(fColor.rgb, 1.0);
+                    }
+                    
                 }
                 </script>
         
@@ -190,13 +216,13 @@
             <div class="dropdown" id="texture-form">
                 <div class="dropdown-content">
                     <form>
-                        <input type="radio" id="bump" name="radio-group" onclick="">
+                        <input type="radio" id="bump" name="radio-group" onclick="changeMapping('bump')">
                         <label for="bump" class="radio-label">Bump</label><br>     
                         
-                        <input type="radio" id="reflective" name="radio-group" onclick="">
+                        <input type="radio" id="reflective" name="radio-group" onclick="changeMapping('reflective')">
                         <label for="reflective" class="radio-label">Reflective</label><br>     
 
-                        <input type="radio" id="custom" name="radio-group" onclick="">
+                        <input type="radio" id="custom" name="radio-group" onclick="changeMapping('custom')">
                         <label for="custom" class="radio-label">Custom</label>    
                     </form>
                 </div>

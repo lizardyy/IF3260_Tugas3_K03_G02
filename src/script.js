@@ -9,6 +9,7 @@ var viewMatrix
 var projMatrix
 var mIdentity
 var transformMatrixComponent
+var textureBuffer
 
 var rotAngle = [0,0,0]
 var translation = [0,0,0];
@@ -19,6 +20,9 @@ var color = [0.2 ,0.1 , 0.4];
 var animation = false;
 var number = 0;
 var shading = true;
+var customMapping = false;
+var reflectiveMapping = false;
+var bumpMapping = false;
 var selectedComponent =-1;
 
 
@@ -79,6 +83,9 @@ function defaultState() {
   animation = false;
   number = 0;
   shading = true;
+  customMapping = false;
+  reflectiveMapping = false;
+  bumpMapping = false;
 }
 
 /* Initialize */
@@ -99,6 +106,9 @@ window.onload = function init() {
   var boxIndexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, boxIndexBuffer);
 
+  textureBuffer = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureBuffer);
+
   var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition,3,gl.FLOAT,gl.FALSE,6 * Float32Array.BYTES_PER_ELEMENT,0);
   gl.enableVertexAttribArray(vPosition);
@@ -114,6 +124,9 @@ window.onload = function init() {
   matProjLocation = gl.getUniformLocation(program, 'mProj');
   lightDirectionLocation = gl.getUniformLocation(program, 'uLightDirection');
   shadingLocation = gl.getUniformLocation(program, 'shading');
+  customMappingLocation = gl.getUniformLocation(program, 'customMapping');
+  reflectiveMappingLocation = gl.getUniformLocation(program, 'reflectiveMapping');
+  bumpMappingLocation = gl.getUniformLocation(program, 'bumpMapping');
 
   // worldMatrix = new Float32Array(16);
   viewMatrix = new Float32Array(16);
@@ -172,6 +185,9 @@ function render() {
     gl.uniformMatrix4fv(matViewLocation, gl.FALSE, viewMatrix);
     gl.uniformMatrix4fv(matProjLocation, gl.FALSE, projMatrix);
     gl.uniform1i(shadingLocation, shading);
+    gl.uniform1i(customMappingLocation, customMapping);
+    gl.uniform1i(reflectiveMappingLocation, reflectiveMapping);
+    gl.uniform1i(bumpMappingLocation, bumpMapping);
 
     gl.clearColor(0.125, 0.125, 0.118, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -206,39 +222,44 @@ const hexToRgb = (hex) => {
 }
 
 function shaderModel(color){
-  let r = color[0]
-  let g = color[1]
-  let b = color[2]
-
-  if (shading){
-    for (var i = 0; i < model.length; i++){
-      var sides = 6;
-      if (number == 1){
-        sides = 5;
-      }
-      var color = [0.0, 0.0, 0.0];
-      for (var j = 3; j < model[i].length; j+=6){
-        if (j < sides * 24){
-          color = [(0.3+r)/1.4,(0.3+g)/1.4,(0.3+b)/1.4];
-        } else if (j >= sides * 24 && j < sides * 2 * 24){
-          color = [r/1.3,g/1.3,b/1.3];
-        } else {
-          color = [r,g,b];
-        }
-        model[i][j] = color[0];
-        model[i][j+1] = color[1];
-        model[i][j+2] = color[2];
-      }
-    }
-  } else {
-    for (var i = 0; i < model.length; i++){
-      for (var j = 3; j < model[i].length; j+=6){
-        model[i][j] = r;
-        model[i][j+1] = g;
-        model[i][j+2] = b;
-      }
-    }
+  if (!shading){
+    customMapping = false;
+    reflectiveMapping = false;
+    bumpMapping = false;
   }
+  // let r = color[0]
+  // let g = color[1]
+  // let b = color[2]
+
+  // // if (shading){
+  // //   for (var i = 0; i < model.length; i++){
+  // //     var sides = 6;
+  // //     if (number == 1){
+  // //       sides = 5;
+  // //     }
+  // //     var color = [0.0, 0.0, 0.0];
+  // //     for (var j = 3; j < model[i].length; j+=6){
+  // //       if (j < sides * 24){
+  // //         color = [(0.3+r)/1.4,(0.3+g)/1.4,(0.3+b)/1.4];
+  // //       } else if (j >= sides * 24 && j < sides * 2 * 24){
+  // //         color = [r/1.3,g/1.3,b/1.3];
+  // //       } else {
+  // //         color = [r,g,b];
+  // //       }
+  // //       model[i][j] = color[0];
+  // //       model[i][j+1] = color[1];
+  // //       model[i][j+2] = color[2];
+  // //     }
+  // //   }
+  // // } else {
+  // //   for (var i = 0; i < model.length; i++){
+  // //     for (var j = 3; j < model[i].length; j+=6){
+  // //       model[i][j] = r;
+  // //       model[i][j+1] = g;
+  // //       model[i][j+2] = b;
+  // //     }
+  // //   }
+  // // }
 }
 
 function changeShading(e) {
@@ -483,4 +504,69 @@ function selectComponent(idx) {
     console.log(idx);
     selectedComponent = idx;
   }, 0);
+}
+
+function changeMapping(type){
+  if (type == 'bump'){
+    
+  } else if (type == 'reflective') {
+    
+  } else if (type == 'custom'){
+    customMapping = true;
+    reflectiveMapping = false;
+    bumpMapping = false;
+    setCustomMapping()
+  }
+}
+
+function setCustomMapping(){
+  const faceInfos = [
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, url: '../texture/texture2.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, url: '../texture/texture2.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, url: '../texture/texture2.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, url: '../texture/texture2.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, url: '../texture/texture2.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: '../texture/texture2.jpeg',
+    },
+  ];
+
+  faceInfos.forEach((faceInfo) => {
+    const {target, url} = faceInfo;
+  
+    // Upload canvas ke cubemap
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 512;
+    const height = 512;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+    
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureBuffer);
+    gl.texImage2D(target, level, internalFormat, width, height, 0, format, type, null);
+  
+    // Load image
+    const image = new Image();
+    image.src = url;
+    image.addEventListener('load', function() {
+      // Upload ke texture.
+      
+      gl.texImage2D(target, level, internalFormat, format, type, image);
+      gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+    });
+
+  });
+
+  gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 }
