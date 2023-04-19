@@ -24,7 +24,7 @@ var customMapping = false;
 var reflectiveMapping = false;
 var bumpMapping = false;
 var selectedComponent =-1;
-
+var lightDirection = [1, 1, 1];
 
 /* Dropdown Handler */
 function toggleDropdown(dropdownId) {
@@ -52,7 +52,10 @@ const inputs = [
   {input: document.getElementById('y-translate'), value: document.getElementById('y-translate-value'), unit: ''},
   {input: document.getElementById('z-translate'), value: document.getElementById('z-translate-value'), unit: ''},
   {input: document.getElementById('angle-camera'), value: document.getElementById('angle-camera-value'), unit: '°'},
-  {input: document.getElementById('radius-camera'), value: document.getElementById('radius-camera-value'), unit: ''}
+  {input: document.getElementById('radius-camera'), value: document.getElementById('radius-camera-value'), unit: ''},
+  {input: document.getElementById('light-x'), value: document.getElementById('light-x-value'), unit: ''},
+  {input: document.getElementById('light-y'), value: document.getElementById('light-y-value'), unit: ''},
+  {input: document.getElementById('light-z'), value: document.getElementById('light-z-value'), unit: ''}
 ];
 
 inputs.forEach(({input, value, unit}) => {
@@ -86,6 +89,7 @@ function defaultState() {
   customMapping = false;
   reflectiveMapping = false;
   bumpMapping = false;
+  lightDirection = [1, 1, 1];
 }
 
 /* Initialize */
@@ -138,9 +142,6 @@ window.onload = function init() {
   gl.uniformMatrix4fv(matViewLocation, gl.FALSE, viewMatrix);
   gl.uniformMatrix4fv(matProjLocation, gl.FALSE, projMatrix);
 
-  const lightDirection = [1, 1, 1]
-  gl.uniform3fv(lightDirectionLocation, lightDirection);
-
 /* Shape Button Handler */
   const buttons = document.querySelectorAll('.shape');
   buttons.forEach(button => {
@@ -188,6 +189,7 @@ function render() {
     gl.uniform1i(customMappingLocation, customMapping);
     gl.uniform1i(reflectiveMappingLocation, reflectiveMapping);
     gl.uniform1i(bumpMappingLocation, bumpMapping);
+    gl.uniform3fv(lightDirectionLocation, lightDirection);
 
     gl.clearColor(0.125, 0.125, 0.118, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -298,6 +300,11 @@ function translateModel(id, value) {
   translation[id] = value
 }
 
+function changeLightDirection(id, value) {
+  lightDirection[id] = Number(value);
+  console.log(lightDirection);
+}
+
 function scaleModel(id, value){
   // stopAnimation()
   scale[id] = value
@@ -340,10 +347,27 @@ function resetCameraView(){
   document.getElementById("shading").checked = true;
   document.getElementById("color-picker").value = "#331A66";
   document.getElementById("perspective").checked = true;
-  document.getElementById("set-cube").classList.add("active");
-  document.getElementById("set-triangularPrism").classList.remove("active");
-  document.getElementById("set-squarePyramid").classList.remove("active");
-  document.getElementById("set-loadedModel").classList.remove("active");
+  const setCube = document.getElementById("set-cube");
+  if(setCube != null) {
+    setCube.classList.add("active");
+  }
+  // document.getElementById("set-cube").classList.add("active");
+  const setTriangularPrism = document.getElementById("set-triangularPrism");
+  if(setTriangularPrism != null) {
+    setTriangularPrism.classList.remove("active");
+  }
+  // document.getElementById("set-triangularPrism").classList.remove("active");
+  const setSquarePyramid = document.getElementById("set-squarePyramid");
+  if(setSquarePyramid != null) {
+    setSquarePyramid.classList.remove("active");
+  }
+
+  // document.getElementById("set-squarePyramid").classList.remove("active");
+  const setLoadedModel = document.getElementById("set-loadedModel");
+  if(setLoadedModel != null) {
+    setLoadedModel.classList.remove("active");
+  }
+  // document.getElementById("set-loadedModel").classList.remove("active");
 }
 
 function stopAnimation(){

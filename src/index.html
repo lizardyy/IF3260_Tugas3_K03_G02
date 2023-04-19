@@ -227,7 +227,27 @@
                     </form>
                 </div>
             </div>
-
+            <button class="button_func" id="light-btn" onclick="toggleDropdown('light-form')">
+                <i class="fa-solid fa-sun"></i>
+            </button>
+            <div class="dropdown" id="light-form">
+                <div class="dropdown-content">
+                    <form>
+                        <label for="light-x">Light x</label>
+                        <p class="range-value" id="light-x-value">0</p>
+                        <input type="range" id="light-x" name="light-x" min="-1" max="1" step="0.05" value="1" oninput="changeLightDirection(0, this.value)">
+                        <br>
+                        <label for="light-y">Light y</label>
+                        <p class="range-value" id="light-y-value">0</p>
+                        <input type="range" id="light-y" name="light-y" min="-1" max="1" step="0.05" value="1" oninput="changeLightDirection(1, this.value)">
+                        <br>
+                        <label for="light-z">Light z</label>
+                        <p class="range-value" id="light-z-value">0</p>
+                        <input type="range" id="light-z" name="light-z" min="-1" max="1" step="0.05" value="1" oninput="changeLightDirection(2, this.value)">
+                        
+                    </form>
+                </div>
+            </div>
         </div>
         <!-- <div class="row" id="full-row">
             
