@@ -231,7 +231,7 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     let j = 0;
-    console.log("children length: " + children.length);
+    // console.log("children length: " + children.length);
     for (let i=0;i <model.length;i++){
       if (i == selectedComponent){
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), transformMatrixComponent)), gl.STATIC_DRAW);
@@ -527,17 +527,43 @@ function saveModel() {
 
 
 
-function generateTree(){
-  let inner = '<input type="radio" id="component--1" name="component" onclick="selectComponent(' + -1 + ')" style="display: none;">';
-  inner += '<label for="component--1" class="radio-label"">Root</label><br>';
+
+tree = [];
+innercomponent = ''
+function generateTree() {
+
+  innercomponent = '<input type="radio" id="component--1" name="component" onclick="selectComponent(' + -1 + ')" style="display: none;">';
+  innercomponent += '<label for="component--1" class="radio-label"">Root</label><br>';
 
   for (let i = 0; i < model.length; i++) {
-    inner += '<input type="radio" id="component-' + i + '" name="component" onclick="selectComponent(' + i + ')" style="display: none;">';
-    inner += '<label for="component-' + i + '" class="radio-label">' + model[i].getName() + '</label><br>';
+    tree.push(i)
   }
 
-  document.getElementById("component-tree").innerHTML = inner;
+  while (tree.length != 0) {
+    console.log(tree)
+    generateComponentTree(0, 0)
+    console.log("1" + innercomponent)
+  }
+  document.getElementById("component-tree").innerHTML = innercomponent;
   document.getElementById("component--1").checked = true;
+}
+
+function generateComponentTree(idx, space) {
+  for (let i = 0; i < space; i++) {
+    innercomponent += '&nbsp;'
+  }
+
+  innercomponent += '<input type="radio" id="component-' + idx + '" name="component" onclick="selectComponent(' + idx + ')" style="display: none;">';
+  for (let i = 0; i < space; i++) {
+    innercomponent += '&nbsp;'
+  }
+  innercomponent += '<label for="component-' + idx + '" class="radio-label">' + model[idx].getName() + '</label><br>';
+
+  tree.splice(tree.indexOf(idx), 1)
+
+  for (let i = 0; i < model[idx].children.length; i++) {
+    generateComponentTree(model[idx].children[i], space + 1)
+  }
 }
 
 
