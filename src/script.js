@@ -30,6 +30,23 @@ var bumpMapping = false;
 var selectedComponent =-1;
 var lightDirection = [1, 1, 1];
 
+var state = {
+  rotAngle :[0, 0, 0],
+  translation :[0, 0, 0],
+  scale :[1, 1, 1],
+  camAngle :0,
+  camRadius :5,
+  color :[0.2, 0.1, 0.4],
+  animation :false,
+  number :0,
+  shading :true,
+  customMapping :false,
+  reflectiveMapping :false,
+  bumpMapping :false,
+  selectedComponent :-1,
+  lightDirection :[1, 1, 1],
+
+}
 /* Dropdown Handler */
 function toggleDropdown(dropdownId) {
     var dropdowns = document.querySelectorAll('.dropdown.show');
@@ -94,6 +111,22 @@ function defaultState() {
   reflectiveMapping = false;
   bumpMapping = false;
   lightDirection = [1, 1, 1];
+}
+
+function changeState(state) {
+  rotAngle = state.rotAngle;
+  translation = state.translation;
+  scale = state.scale;
+  camAngle = state.camAngle;
+  camRadius = state.camRadius;
+  color = state.color;
+  animation = state.animation;
+  number = state.number;
+
+  inputs.forEach(function (item) {
+    item.input.value = item.input.defaultValue;
+    item.value.innerText = item.input.defaultValue + item.unit;
+  })
 }
 
 /* Initialize */
@@ -176,14 +209,16 @@ function render() {
       rotAngle[1] += (1/1800 * Math.PI);
       rotAngle[2] += (1/1800 * Math.PI);
     } 
+    if(selectedComponent == -1){
+      worldMatrix = transformMatrix.projection(2, 2, 2)
+      worldMatrix = transformMatrix.translate(worldMatrix, translation[0], translation[1], translation[2]);
+      worldMatrix = transformMatrix.xRotate(worldMatrix, rotAngle[0]);
+      worldMatrix = transformMatrix.yRotate(worldMatrix, rotAngle[1]);
+      worldMatrix = transformMatrix.zRotate(worldMatrix, rotAngle[2]);
+      worldMatrix = transformMatrix.scale(worldMatrix, scale[0], scale[1], scale[2]);
 
-    worldMatrix = transformMatrix.projection(2, 2, 2)
-    worldMatrix = transformMatrix.translate(worldMatrix, translation[0], translation[1], translation[2]);
-    worldMatrix = transformMatrix.xRotate(worldMatrix, rotAngle[0]);
-    worldMatrix = transformMatrix.yRotate(worldMatrix, rotAngle[1]);
-    worldMatrix = transformMatrix.zRotate(worldMatrix, rotAngle[2]);
-    worldMatrix = transformMatrix.scale(worldMatrix, scale[0], scale[1], scale[2]);
-    
+    }
+   
     
     let children = [];
     if (selectedComponent != -1){
@@ -199,7 +234,22 @@ function render() {
       else if (model[selectedComponent].getRotationAxis() == "y")transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
       else if (model[selectedComponent].getRotationAxis() == "z")transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
       transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
-
+      // transformMatrixComponent = model[selectedComponent].getTransformMatrix()
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, translation[0], translation[1], translation[2]);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
+      transformMatrixComponent = transformMatrix.xRotate(transformMatrixComponent, rotAngle[0]);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
+      transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, rotAngle[1]);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
+      transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, rotAngle[2]);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
+      transformMatrixComponent = transformMatrix.scale(transformMatrixComponent, scale[0], scale[1], scale[2]);
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
       // Iterate the children
       let transformMatrixComponentChildArray = [];
       for (let i=0;i<children.length;i++){
@@ -217,8 +267,12 @@ function render() {
         transformMatrixComponentChildArray.push(transformMatrixComponentChild);
       }
     }
+    if (selectedComponent == -1) {
+      gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
+    }
+    else {
 
-    gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
+    }
     gl.uniformMatrix4fv(matViewLocation, gl.FALSE, viewMatrix);
     gl.uniformMatrix4fv(matProjLocation, gl.FALSE, projMatrix);
     gl.uniform1i(shadingLocation, shading);
@@ -470,7 +524,7 @@ function loadModel(){
   reader.onload = function () {
     fileread = JSON.parse(reader.result);
     for (let i = 0; i < fileread.length; i++) {
-      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], fileread[i]["children"], fileread[i]["rotationCoord"], fileread[i]["rotationAxis"], fileread[i]["rotationLimit"], fileread[i]["rotationAngle"], worldMatrix))
+      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], fileread[i]["children"], fileread[i]["rotationCoord"], fileread[i]["rotationAxis"], fileread[i]["rotationLimit"], fileread[i]["rotationAngle"], worldMatrix, state))
     }
     generateTree()
   }
@@ -583,15 +637,14 @@ function selectComponent(idx) {
     value.style.display = 'inline';
     input.style.display = 'inline';
 
-    label.textContent = model[selectedComponent].getName() + ' Rotation:';
+    label.textContent = model[idx].getName() + ' Rotation:';
     partRotation.value = model[selectedComponent].getRotationAngle() * 180 / Math.PI
     console.log(partRotation.value);
     value.innerText = partRotation.value + '°';
     partRotation.min = rotationLimit[0];
     partRotation.max = rotationLimit[1];
+    changeState(model[selectedComponent].state)
 
-    console.log(model[selectedComponent].getName());
-    console.log(partRotation.min);
   } else {
     label.style.display = 'none';
     value.style.display = 'none';
