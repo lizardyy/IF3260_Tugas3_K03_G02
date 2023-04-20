@@ -48,6 +48,11 @@ var state = {
 
 }
 
+var modelName
+var isAnimationPlaying = false
+var animationVal = 0.5;
+var animationSpeed = 1
+
 /* Dropdown Handler */
 function toggleDropdown(dropdownId) {
     var dropdowns = document.querySelectorAll('.dropdown.show');
@@ -234,6 +239,9 @@ function render(currentTime) {
   mIdentity = new Float32Array(16);
   identity(mIdentity);
   var loop = () => {
+    if(isAnimationPlaying) {
+      animateModel();
+    }
     if (animation){
       rotAngle[0] += (1/1800 * Math.PI);
       rotAngle[1] += (1/1800 * Math.PI);
@@ -487,6 +495,7 @@ function multVerticesTransformMatrix(vertices,transformMatrix) {
 
 function loadModel(){
   const file = document.getElementById("file-input").files[0];
+  modelName = file.name
   var fileread;
   let reader = new FileReader();
 
@@ -919,4 +928,51 @@ function setNormals(gl) {
        1, 0, 0,
     ]);
   gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
+}
+
+function playAnimation() {
+  isAnimationPlaying = true;
+}
+
+function stopAnimationFunction() {
+  isAnimationPlaying = false;
+}
+
+function twoTimeAnimation() {
+  if(animationSpeed == 2) {
+    animationSpeed = 1;
+  }
+  else {
+    animationSpeed = 2;
+  }
+}
+
+let humanAnimationState = 0;
+
+function animateModel() {
+  if(modelName === "human.json")
+  {
+    if(humanAnimationState === 0) {
+      const component1Label = document.getElementById("component-2");
+      component1Label.click();
+      humanAnimationState = 1;
+    }
+    if(humanAnimationState === 1) {
+      const xRotation = document.getElementById("x-rotation");
+      xRotation.value = (xRotation.value + animationVal * animationSpeed) % 361;
+      xRotation.dispatchEvent(new Event("input"));
+      humanAnimationState = 2;
+    }
+    if(humanAnimationState === 2) {
+      const component3Label = document.getElementById("component-3");
+      component3Label.click();
+      humanAnimationState = 3;
+    }
+    if(humanAnimationState === 3) {
+      const xRotation = document.getElementById("x-rotation");
+      xRotation.value = (xRotation.value + animationVal * animationSpeed) % 361;
+      xRotation.dispatchEvent(new Event("input"));
+      humanAnimationState = 0;
+    }
+  }
 }
