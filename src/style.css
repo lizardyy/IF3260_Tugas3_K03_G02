@@ -67,6 +67,7 @@ hr {
     flex-direction: column;
     justify-content: center;
     align-content: center;
+    align-items: center;
     padding: 1rem;
 }
 
@@ -82,7 +83,7 @@ hr {
     font-weight: 500;
     display: inline-block;
     font-size: 12px;
-    margin: 4px 10px;
+    margin: 10px;
     border-radius: 50%;
 }
 
@@ -96,10 +97,10 @@ hr {
     min-width: 65px;
     height: fit-content;
     min-height: 30px;
-    border-radius: 50%;
+    border-radius: 5%;
     padding: 5px 10px;
     margin-bottom: 10px;
-    align-self: center;
+    /* align-self: center; */
 }
 
 /* DROPDOWN */
@@ -116,8 +117,8 @@ hr {
     background-color: white;
     color: #000;
     min-width: 220px;
-    bottom: 60px;
-    left: -50px;
+    top: -60px;
+    right: 40px;
   }
 
   .show .dropdown-content {
@@ -167,7 +168,7 @@ input[type="radio"] {
     position: relative;
     width: 60px;
     height: 34px;
-    margin-bottom: 50px;
+    margin-bottom: 10px;
   }
   
   .toggle-switch input {

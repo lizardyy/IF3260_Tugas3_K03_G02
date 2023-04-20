@@ -377,14 +377,6 @@ function changeAnimation(e) {
 
 document.getElementById("animation").addEventListener('change', changeAnimation, false);
 
-function changeColor(e) {
-  color = hexToRgb(document.querySelector("#color-picker").value);
-  shaderModel(color);
-}
-
-document.getElementById("color-picker").addEventListener('input', changeColor, false);
-
-
 function rotateModel(id, angle) {
   stopAnimation()
   if (id != 3){
@@ -445,7 +437,6 @@ function resetCameraView(){
 
   // reset value of all button
   document.getElementById("shading").checked = true;
-  document.getElementById("color-picker").value = "#331A66";
   document.getElementById("perspective").checked = true;
   const setCube = document.getElementById("set-cube");
   if(setCube != null) {
