@@ -25,35 +25,35 @@
 ### **Cara Penggunaan**
 1. Menyimpan & Mengupload Model
 
-> Untuk menyimpan model yang telah dibuat, tekan tombol <b><i>save</i></b> pada bagian kanan layar dan objek akan tersimpan dengan format <b>json</b>.
-> Untuk mengupload model yang telah disimpan, tekan tombol <b><i>upload</i></b> pada bagian kanan layar, lalu pilih file berformat <b>json</b> dan tekan tombol bergambar <b><i>upload</i></b> pada bagian kiri layar untuk melihat model yang telah diload.
+> Untuk menyimpan model yang telah dibuat, tekan tombol <b><i>save</i></b> pada bagian kiri layar dan objek akan tersimpan dengan format <b>json</b>.
+> Untuk mengupload model yang telah disimpan, tekan tombol <b><i>upload</i></b> pada bagian kiri layar, lalu pilih file berformat <b>json</b>.
 
 2. Memilih Jenis Proyeksi
 
-> Untuk mengubah jenis proyeksi yang diinginkan, tekan tombol <b>proyeksi</b> bergambar video kamera pada bagian bawah layar dan memilih jenis proyeksi yang diinginkan diantara <b>Orthographic</b>, <b>Oblique</b>, atau <b>Perspective</b>.
+> Untuk mengubah jenis proyeksi yang diinginkan, tekan tombol <b>proyeksi</b> bergambar video kamera pada bagian kanan layar dan memilih jenis proyeksi yang diinginkan diantara <b>Orthographic</b>, <b>Oblique</b>, atau <b>Perspective</b>.
 
 3. Melakukan Rotasi
 
-> Untuk melakukan rotasi pada objek, tekan tombol <b>rotasi</b> bergambar panah berputar pada bagian bawah layar dan menggeser slider pada sumbu rotasi yang ingin diputar. Apabila ingin melakukan rotasi pada komponen tertentu, pastikan bahwa komponen sudah terpilih pada *component tree*.
+> Untuk melakukan rotasi pada objek, tekan tombol <b>rotasi</b> bergambar panah berputar pada bagian kanan layar dan menggeser slider pada sumbu rotasi yang ingin diputar. Apabila ingin melakukan rotasi pada komponen tertentu, pastikan bahwa komponen sudah terpilih pada *component tree*.
 
 
 4. Melakukan *Scaling*
 
-> Untuk melakukan <i>scaling</i> pada objek, tekan tombol <b><i>scaling</i></b> bergambar panah dua arah pada bagian bawah layar dan menggeser slider pada sumbu yang ingin diperbesar/diperkecil.
+> Untuk melakukan <i>scaling</i> pada objek, tekan tombol <b><i>scaling</i></b> bergambar panah dua arah pada bagian kanan layar dan menggeser slider pada sumbu yang ingin diperbesar/diperkecil.
 
 5. Melakukan Translasi
 
-> Untuk melakukan translasi pada objek, tekan tombol <b>translasi</b> bergambar panah 4 arah pada bagian bawah layar dan menggeser slider pada sumbu yang ingin ditranslasi.
+> Untuk melakukan translasi pada objek, tekan tombol <b>translasi</b> bergambar panah 4 arah pada bagian kanan layar dan menggeser slider pada sumbu yang ingin ditranslasi.
 
 6. Mengubah *Camera View*
 
-> Untuk mengubah <i>camera view</i> pada objek, tekan tombol <b><i>camera view</i></b> bergambar kamera pada bagian bawah layar.
+> Untuk mengubah <i>camera view</i> pada objek, tekan tombol <b><i>camera view</i></b> bergambar kamera pada bagian kanan layar.
 > Geser slider dengan judul <b><i>Angle</i></b> untuk merubah <b><i>angle camera</i></b>.
 > Geser slider dengan judul <b><i>Radius</i></b> untuk merubah <b><i>radius camera</i></b>.
 
 7. Mereset *Camera View*
 
-> Untuk mereset <i>camera view</i> pada objek, tekan tombol <b><i>reset camera view</i></b> pada bagian kanan layar.
+> Untuk mereset <i>camera view</i> pada objek, tekan tombol <b><i>reset camera view</i></b> pada bagian kiri layar.
 
 8. Menggunakan *Shading / Animation*
 
@@ -62,4 +62,8 @@
 
 9. Mengubah Tekstur Permukaan Model
 
-> Untuk mengubah teksur permukaan yang diinginkan, tekan tombol <b>tekstur</b> bergambar kuas pada bagian bawah layar dan pilih jenis permukaan yang diinginkan diantara <b>Bump</b>, <b>Reflective</b>, atau <b>Custom</b>.
+> Untuk mengubah teksur permukaan yang diinginkan, tekan tombol <b>tekstur</b> bergambar kuas pada bagian kanan layar dan pilih jenis permukaan yang diinginkan diantara <b>Bump</b>, <b>Reflective</b>, atau <b>Custom</b>.
+
+10. Lighting
+
+> Untuk mengubah <i>lighting</i> pada objek, tekan tombol <b><i>lighting</i></b> bergambar matahari pada bagian kanan layar dan geser slide sesuai dengan arah yang diinginkan.
