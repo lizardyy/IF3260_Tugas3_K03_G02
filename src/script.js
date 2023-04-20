@@ -202,6 +202,7 @@ window.onload = function init() {
   lookAt(viewMatrix, [0, 0, 5], [0, 0, 0], [0, 1, 0]);
   perspective(projMatrix, toRadian(45), canvas.width / canvas.height, 0.1, 100.0);
   document.getElementById("perspective").checked = true;
+  document.getElementById("default").checked = true;
 
   gl.uniformMatrix4fv(matViewLocation, gl.FALSE, viewMatrix);
   gl.uniformMatrix4fv(matProjLocation, gl.FALSE, projMatrix);
@@ -632,6 +633,11 @@ function changeMapping(type){
     reflectiveMapping = false;
     bumpMapping = false;
     setCustomMapping()
+  } else if (type == 'default'){
+    customMapping = false;
+    reflectiveMapping = false;
+    bumpMapping = false;
+    setDefaultMapping()
   }
 }
 
@@ -800,6 +806,58 @@ function setReflectiveMapping(){
   var normalLocation = gl.getAttribLocation(program, "aNormal");
   gl.enableVertexAttribArray(normalLocation);
   gl.vertexAttribPointer(normalLocation, 1, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+}
+
+function setDefaultMapping(){
+  const faceInfos = [
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, url: '../texture/plain.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, url: '../texture/plain.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, url: '../texture/plain.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, url: '../texture/plain.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, url: '../texture/plain.jpeg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: '../texture/plain.jpeg',
+    },
+  ];
+
+  faceInfos.forEach((faceInfo) => {
+    const {target, url} = faceInfo;
+  
+    // Upload canvas ke cubemap
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 512;
+    const height = 512;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+    
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureBuffer);
+    gl.texImage2D(target, level, internalFormat, width, height, 0, format, type, null);
+  
+    // Load image
+    const image = new Image();
+    image.src = url;
+    image.addEventListener('load', function() {
+      // Upload ke texture.
+      
+      gl.texImage2D(target, level, internalFormat, format, type, image);
+      gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+    });
+
+  });
+
+  gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 }
 
 function setNormals(gl) {
