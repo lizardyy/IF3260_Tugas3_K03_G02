@@ -13,6 +13,7 @@
         <script id="vertex-shader" type="x-shader/x-vertex">
                 precision mediump float;
                 attribute vec3 vPosition;
+                attribute vec3 aNormal;
                 attribute vec3 vColor;
                 varying vec3 fColor;
 
@@ -22,6 +23,9 @@
 
                 uniform vec3 uLightDirection;
                 varying vec3 vNormal;
+
+                varying vec3 vWorldPosition;
+                varying vec3 vWorldNormal;
 
                 uniform bool shading;
                 uniform bool customMapping;
@@ -37,6 +41,8 @@
                     }
                     gl_Position = mProj * mView * mWorld * vec4(vPosition, 1.0);
                     vNormal = normalize(vPosition.xyz);
+                    vWorldPosition = (mWorld * vec4(vPosition, 1.0)).xyz;
+                    vWorldNormal = mat3(mWorld) * aNormal;
                 }
         </script>
         <script id="fragment-shader" type="x-shader/x-fragment">
@@ -46,11 +52,18 @@
                 varying vec3 vNormal;
                 uniform samplerCube uTexture;
 
+                varying vec3 vWorldPosition;
+                varying vec3 vWorldNormal;
+
+                uniform vec3 uWorldCameraPosition;
                 uniform bool shading;
                 uniform bool customMapping;
                 uniform bool bumpMapping;
                 uniform bool reflectiveMapping;
                 void main(){
+                    vec3 worldNormal = normalize(vWorldNormal);
+                    vec3 eyeToSurfaceDir = normalize(vWorldPosition - uWorldCameraPosition);
+                    vec3 direction = reflect(eyeToSurfaceDir, worldNormal);
                     if(customMapping) {
                         gl_FragColor = textureCube(uTexture, normalize(vNormal));
                     }
@@ -58,7 +71,7 @@
                         
                     }
                     else if(reflectiveMapping) {
-                        
+                        gl_FragColor = textureCube(uTexture, direction);
                     }
                     else {
                         gl_FragColor = vec4(fColor.rgb, 1.0);

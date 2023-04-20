@@ -5,11 +5,15 @@ var matViewLocation
 var matProjLocation
 var lightDirectionLocation
 var shadingLocation
+var textureLocation
+var worldCameraLocation
+var normalLocation
 var viewMatrix
 var projMatrix
 var mIdentity
 var transformMatrixComponent
 var textureBuffer
+var normalBuffer
 
 var rotAngle = [0,0,0]
 var translation = [0,0,0];
@@ -113,6 +117,10 @@ window.onload = function init() {
   textureBuffer = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureBuffer);
 
+  // normalBuffer = gl.createBuffer();
+  // gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  // setNormals(gl);
+
   var vPosition = gl.getAttribLocation(program, "vPosition");
   gl.vertexAttribPointer(vPosition,3,gl.FLOAT,gl.FALSE,6 * Float32Array.BYTES_PER_ELEMENT,0);
   gl.enableVertexAttribArray(vPosition);
@@ -131,6 +139,8 @@ window.onload = function init() {
   customMappingLocation = gl.getUniformLocation(program, 'customMapping');
   reflectiveMappingLocation = gl.getUniformLocation(program, 'reflectiveMapping');
   bumpMappingLocation = gl.getUniformLocation(program, 'bumpMapping');
+  textureLocation = gl.getUniformLocation(program, 'uTexture');
+  worldCameraLocation = gl.getUniformLocation(program, 'uWorldCameraPosition');
 
   // worldMatrix = new Float32Array(16);
   viewMatrix = new Float32Array(16);
@@ -534,7 +544,10 @@ function changeMapping(type){
   if (type == 'bump'){
     
   } else if (type == 'reflective') {
-    
+    customMapping = false;
+    reflectiveMapping = true;
+    bumpMapping = false;
+    setReflectiveMapping()
   } else if (type == 'custom'){
     customMapping = true;
     reflectiveMapping = false;
@@ -593,4 +606,115 @@ function setCustomMapping(){
 
   gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
   gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+}
+
+function setReflectiveMapping(){
+  textureBuffer = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureBuffer);
+
+  const faceInfos = [
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_X,
+      url: '../texture/pos-x.jpg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X,
+      url: '../texture/neg-x.jpg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y,
+      url: '../texture/pos-y.jpg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y,
+      url: '../texture/neg-y.jpg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z,
+      url: '../texture/pos-z.jpg',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z,
+      url: '../texture/neg-z.jpg',
+    },
+  ];
+
+  faceInfos.forEach((faceInfo) => {
+    const {target, url} = faceInfo;
+  
+    // Upload the canvas to the cubemap face.
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 512;
+    const height = 512;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+  
+    // setup each face so it's immediately renderable
+    gl.texImage2D(target, level, internalFormat, width, height, 0, format, type, null);
+  
+    // Asynchronously load an image
+    const image = new Image();
+    image.src = url;
+    image.addEventListener('load', function() {
+      // Now that the image has loaded upload it to the texture.
+      gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureBuffer);
+      gl.texImage2D(target, level, internalFormat, format, type, image);
+      gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+    });
+  });
+  gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+
+  var normalLocation = gl.getAttribLocation(program, "aNormal");
+  gl.enableVertexAttribArray(normalLocation);
+  gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+}
+
+function setNormals(gl) {
+  var normals = new Float32Array(
+    [
+       0, 0, -1,
+       0, 0, -1,
+       0, 0, -1,
+       0, 0, -1,
+       0, 0, -1,
+       0, 0, -1,
+
+       0, 0, 1,
+       0, 0, 1,
+       0, 0, 1,
+       0, 0, 1,
+       0, 0, 1,
+       0, 0, 1,
+
+       0, 1, 0,
+       0, 1, 0,
+       0, 1, 0,
+       0, 1, 0,
+       0, 1, 0,
+       0, 1, 0,
+
+       0, -1, 0,
+       0, -1, 0,
+       0, -1, 0,
+       0, -1, 0,
+       0, -1, 0,
+       0, -1, 0,
+
+      -1, 0, 0,
+      -1, 0, 0,
+      -1, 0, 0,
+      -1, 0, 0,
+      -1, 0, 0,
+      -1, 0, 0,
+
+       1, 0, 0,
+       1, 0, 0,
+       1, 0, 0,
+       1, 0, 0,
+       1, 0, 0,
+       1, 0, 0,
+    ]);
+  gl.bufferData(gl.ARRAY_BUFFER, normals, gl.STATIC_DRAW);
 }
