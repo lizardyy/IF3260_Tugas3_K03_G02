@@ -287,7 +287,10 @@ function render() {
     let j = 0;
     // console.log("children length: " + children.length);
     for (let i=0;i <model.length;i++){
-      if (i == selectedComponent){
+      if (selectedComponent ==-1){
+
+      }
+      else if (i == selectedComponent || model[selectedComponent].children.indexOf(i)!=-1){
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), transformMatrixComponent)), gl.STATIC_DRAW);
       } 
       // else if (children.includes(i)){ 
@@ -535,7 +538,7 @@ function loadModel(){
   label.style.display = 'none';
   value.style.display = 'none';
   input.style.display = 'none';
-
+  selectedComponent = 0
   resetCameraView()
 }
 
@@ -585,10 +588,7 @@ function saveModel() {
 tree = [];
 innercomponent = ''
 function generateTree() {
-
-  innercomponent = '<input type="radio" id="component--1" name="component" onclick="selectComponent(' + -1 + ')" style="display: none;">';
-  innercomponent += '<label for="component--1" class="radio-label"">Root</label><br>';
-
+  innercomponent = ''
   for (let i = 0; i < model.length; i++) {
     tree.push(i)
   }
@@ -599,7 +599,7 @@ function generateTree() {
     console.log("1" + innercomponent)
   }
   document.getElementById("component-tree").innerHTML = innercomponent;
-  document.getElementById("component--1").checked = true;
+  document.getElementById("component-0").checked = true;
 }
 
 function generateComponentTree(idx, space) {
@@ -652,10 +652,7 @@ function selectComponent(idx) {
   }
 
   // update the selected component after a delay of 0ms
-  setTimeout(function() {
-    console.log(idx);
-    selectedComponent = idx;
-  }, 0);
+  selectedComponent = idx;
 }
 
 function changeMapping(type){
