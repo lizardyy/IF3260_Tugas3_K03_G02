@@ -185,6 +185,7 @@
 			20,
 			22
 		],
+		"children" : [2, 3, 4, 5],
 		"rotationCoord": [0, 0, -2],
 		"rotationAxis" : "y",
 		"rotationLimit": [-4, 4],
@@ -376,6 +377,7 @@
 			20,
 			22
 		],
+		"children" : [6],
 		"rotationCoord": [0, 0.2, -1],
 		"rotationAxis" : "y",
 		"rotationLimit": [-1, 1],
@@ -567,6 +569,7 @@
 			20,
 			22
 		],
+		"children" : [],
 		"rotationCoord": [-0.65, 0, -1],
 		"rotationAxis" : "x",
 		"rotationLimit": [-10, 10],
@@ -710,6 +713,7 @@
 			20,
 			22
 		],
+		"children" : [],
 		"rotationCoord": [0.65, 0, -1],
 		"rotationAxis" : "x",
 		"rotationLimit": [-10, 10],
@@ -853,6 +857,7 @@
 			20,
 			22
 		],
+		"children" : [],
 		"rotationCoord": [0.65, 0, -3],
 		"rotationAxis" : "x",
 		"rotationLimit": [-10, 10],
@@ -996,6 +1001,7 @@
 			20,
 			22
 		],
+		"children" : [],
 		"rotationCoord": [-0.65, 0, -3],
 		"rotationAxis" : "x",
 		"rotationLimit": [-10, 10],
@@ -1139,6 +1145,7 @@
 			20,
 			22
 		],
+		"children" : [],
 		"rotationCoord": [0, 0, 1.15],
 		"rotationAxis" : "z",
 		"rotationLimit": [-5, 5],

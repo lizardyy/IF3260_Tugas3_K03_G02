@@ -183,8 +183,12 @@ function render() {
     worldMatrix = transformMatrix.yRotate(worldMatrix, rotAngle[1]);
     worldMatrix = transformMatrix.zRotate(worldMatrix, rotAngle[2]);
     worldMatrix = transformMatrix.scale(worldMatrix, scale[0], scale[1], scale[2]);
+    
+    
+    let children = [];
     if (selectedComponent != -1){
       transformMatrixComponent = model[selectedComponent].getTransformMatrix()
+      children = model[selectedComponent].getChildren();
 
       const rotationCoord = model[selectedComponent].getRotationCoord();
       let xAxis = rotationCoord[0];
@@ -195,6 +199,23 @@ function render() {
       else if (model[selectedComponent].getRotationAxis() == "y")transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
       else if (model[selectedComponent].getRotationAxis() == "z")transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
       transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
+
+      // Iterate the children
+      let transformMatrixComponentChildArray = [];
+      for (let i=0;i<children.length;i++){
+        const idx = children[i];
+        let transformMatrixComponentChild = model[idx].getTransformMatrix()
+        const rotationCoordChild = model[idx].getRotationCoord();
+        xAxis = rotationCoordChild[0];
+        yAxis = rotationCoordChild[1];
+        zAxis = rotationCoordChild[2];
+        transformMatrixComponentChild  = transformMatrix.translate(transformMatrixComponentChild , xAxis, yAxis, zAxis);
+        if (model[selectedComponent].getRotationAxis() == "x")  transformMatrixComponentChild  = transformMatrix.xRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
+        else if (model[selectedComponent].getRotationAxis() == "y")transformMatrixComponentChild  = transformMatrix.yRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
+        else if (model[selectedComponent].getRotationAxis() == "z")transformMatrixComponentChild  = transformMatrix.zRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
+        transformMatrixComponentChild  = transformMatrix.translate(transformMatrixComponentChild , -xAxis, -yAxis, -zAxis);
+        transformMatrixComponentChildArray.push(transformMatrixComponentChild);
+      }
     }
 
     gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
@@ -209,11 +230,18 @@ function render() {
     gl.clearColor(0.125, 0.125, 0.118, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-
+    let j = 0;
+    console.log("children length: " + children.length);
     for (let i=0;i <model.length;i++){
       if (i == selectedComponent){
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), transformMatrixComponent)), gl.STATIC_DRAW);
-      } else {  
+      } 
+      // else if (children.includes(i)){ 
+      //   console.log("j: " + j);
+      //   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), transformMatrixComponentChildArray[j])), gl.STATIC_DRAW);
+      //   j++;
+      // } 
+      else {  
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(mult(model[i].getVertices(), model[i].getTransformMatrix())), gl.STATIC_DRAW);
       }
       gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(model[i].getIndices()), gl.STATIC_DRAW);
@@ -442,7 +470,7 @@ function loadModel(){
   reader.onload = function () {
     fileread = JSON.parse(reader.result);
     for (let i = 0; i < fileread.length; i++) {
-      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], fileread[i]["rotationCoord"], fileread[i]["rotationAxis"], fileread[i]["rotationLimit"], fileread[i]["rotationAngle"], worldMatrix))
+      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], fileread[i]["children"], fileread[i]["rotationCoord"], fileread[i]["rotationAxis"], fileread[i]["rotationLimit"], fileread[i]["rotationAngle"], worldMatrix))
     }
     generateTree()
   }
@@ -464,6 +492,7 @@ function saveModel() {
         name: articulated.name,
         vertices: mult(articulated.getVertices(), transformMatrixComponent),
         indices: articulated.indices,
+        children: articulated.children,
         rotationCoord: articulated.rotationCoord,
         rotationAxis: articulated.rotationAxis,
         rotationLimit: articulated.rotationLimit,
@@ -474,6 +503,7 @@ function saveModel() {
         name: articulated.name,
         vertices: mult(articulated.getVertices(), articulated.getTransformMatrix()),
         indices: articulated.indices,
+        children: articulated.children,
         rotationCoord: articulated.rotationCoord,
         rotationAxis: articulated.rotationAxis,
         rotationLimit: articulated.rotationLimit,
