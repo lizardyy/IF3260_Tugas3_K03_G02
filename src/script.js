@@ -783,7 +783,7 @@ function setReflectiveMapping(){
 
   var normalLocation = gl.getAttribLocation(program, "aNormal");
   gl.enableVertexAttribArray(normalLocation);
-  gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
+  gl.vertexAttribPointer(normalLocation, 1, gl.FLOAT, false, 6 * Float32Array.BYTES_PER_ELEMENT, 3 * Float32Array.BYTES_PER_ELEMENT);
 }
 
 function setNormals(gl) {
