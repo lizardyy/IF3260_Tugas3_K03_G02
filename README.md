@@ -2,7 +2,7 @@
 
 <div align="center">
     <img src="images.png" alt="gambar-web">
-    <h2 align="center">3D Web-GL Hollow Object</h2>
+    <h2 align="center">3D Web-GL <i>Articulated Model</i></h2>
 </div>
 
 ### **Deskripsi Aplikasi**
