@@ -112,7 +112,9 @@ function defaultState() {
 }
 
 function changeState(state) {
+  console.log("sebelum : " + rotAngle)
   rotAngle = state.rotAngle;
+  console.log("sesudah : " + rotAngle)
   translation = state.translation;
   scale = state.scale;
   camAngle = state.camAngle;
@@ -600,23 +602,25 @@ function selectComponent(idx) {
   if (selectedComponent != -1) {
     // update the current selected component
     const partRotation = document.getElementById('part-rotation');
-    const rotationLimit = model[selectedComponent].getRotationLimit();
+    const rotationLimit = model[idx].getRotationLimit();
 
-    model[selectedComponent].setTransformMatrix(transformMatrixComponent);
+    model[idx].setTransformMatrix(transformMatrixComponent);
 
     label.style.display = 'inline';
     value.style.display = 'inline';
     input.style.display = 'inline';
 
     label.textContent = model[idx].getName() + ' Rotation:';
-    partRotation.value = model[selectedComponent].getRotationAngle() * 180 / Math.PI
+    partRotation.value = model[idx].getRotationAngle() * 180 / Math.PI
     console.log(partRotation.value);
     value.innerText = partRotation.value + '°';
     partRotation.min = rotationLimit[0];
     partRotation.max = rotationLimit[1];
-    console.log(model[selectedComponent].state)
+    console.log(model[idx].state);
+    console.log("sebelum di assign: " + selectedComponent);
     selectedComponent = idx;
-    changeState(model[selectedComponent].state)
+    console.log("setelah di assign: " + selectedComponent);
+    changeState(model[selectedComponent].state);
 
   } else {
     label.style.display = 'none';
