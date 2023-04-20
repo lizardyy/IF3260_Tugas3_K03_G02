@@ -12,7 +12,21 @@ class Articulated {
         this.rotationLimit = rotationLimit
         this.rotationAngle = 0
         this.transformMatrix = transformMatrix
-        this.state = state
+        this.state = {
+            rotAngle: [0, 0, 0, 0],
+            translation: [0, 0, 0],
+            scale: [1, 1, 1],
+            camAngle: 0,
+            camRadius: 5,
+            animation: false,
+            number: 0,
+            shading: true,
+            customMapping: false,
+            reflectiveMapping: false,
+            bumpMapping: false,
+            lightDirection: [1, 1, 1],
+
+        }
     }
 
     getVertices() { return this.vertices; }

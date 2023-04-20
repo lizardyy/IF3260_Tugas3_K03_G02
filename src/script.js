@@ -127,23 +127,21 @@ function changeState(state) {
   number = state.number;
   lightDirection = state.lightDirection;
 
-  inputs[0].value = rotAngle[0];
-
-  console.log(inputs[0].value);
-  inputs[1].value = rotAngle[1];
-  inputs[2].value = rotAngle[2];
-  inputs[3].value = rotAngle[3];
-  inputs[4].value = scale[0];
-  inputs[5].value = scale[1];
-  inputs[6].value = scale[2];
-  inputs[7].value = translation[0];
-  inputs[8].value = translation[1];
-  inputs[9].value = translation[2];
-  inputs[10].value = camAngle;
-  inputs[11].value = camRadius;
-  inputs[12].value = lightDirection[0];
-  inputs[13].value = lightDirection[1];
-  inputs[14].value = lightDirection[2];
+  inputs[0].input.value = rotAngle[0];
+  inputs[1].input.value= rotAngle[1];
+  inputs[2].input.value= rotAngle[2];
+  inputs[3].input.value= rotAngle[3];
+  inputs[4].input.value= scale[0];
+  inputs[5].input.value= scale[1];
+  inputs[6].input.value= scale[2];
+  inputs[7].input.value= translation[0];
+  inputs[8].input.value= translation[1];
+  inputs[9].input.value= translation[2];
+  inputs[10].input.value= camAngle;
+  inputs[11].input.value= camRadius;
+  inputs[12].input.value= lightDirection[0];
+  inputs[13].input.value= lightDirection[1];
+  inputs[14].input.value= lightDirection[2];
 }
 
 /* Initialize */
@@ -613,12 +611,16 @@ function selectComponent(idx) {
   const value = document.getElementById('part-rotation-value');
   const input = document.getElementById('part-rotation');
 
+  model[selectedComponent].vertices = mult(model[selectedComponent].getVertices(), transformMatrixComponent)
+  for (i = 0; i < model[selectedComponent].children.length; i++){
+    model[model[selectedComponent].children[i]].vertices = mult(model[model[selectedComponent].children[i]].getVertices(), transformMatrixComponent)
+  }
   if (selectedComponent != -1) {
     // update the current selected component
     const partRotation = document.getElementById('part-rotation');
     const rotationLimit = model[idx].getRotationLimit();
 
-    model[idx].setTransformMatrix(transformMatrixComponent);
+    // model[idx].setTransformMatrix(transformMatrixComponent);
 
     label.style.display = 'inline';
     value.style.display = 'inline';
@@ -630,11 +632,8 @@ function selectComponent(idx) {
     value.innerText = partRotation.value + '°';
     partRotation.min = rotationLimit[0];
     partRotation.max = rotationLimit[1];
-    console.log(model[idx].state);
-    console.log("sebelum di assign: " + selectedComponent);
     selectedComponent = idx;
-    console.log("setelah di assign: " + selectedComponent);
-    changeState(model[selectedComponent].state);
+    changeState(model[idx].state); 
 
   } else {
     label.style.display = 'none';
