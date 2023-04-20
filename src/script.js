@@ -112,6 +112,10 @@ function defaultState() {
   reflectiveMapping = false;
   bumpMapping = false;
   lightDirection = [1, 1, 1];
+
+  inputs.forEach(({input, value, unit}) => {
+    value.innerText = input.value + unit;
+  });
 }
 
 function changeState(state) {
@@ -506,8 +510,9 @@ function loadModel(){
 }
 
 function saveModel() {
+  children = model[selectedComponent].getChildren();
   const transformedModel = model.map((articulated, i) => {
-    if (i === selectedComponent) {
+    if (i === selectedComponent || model[selectedComponent].children.indexOf(i)!=-1) {
       return {
         name: articulated.name,
         vertices: mult(articulated.getVertices(), transformMatrixComponent),
@@ -517,6 +522,8 @@ function saveModel() {
         rotationAxis: articulated.rotationAxis,
         rotationLimit: articulated.rotationLimit,
         rotationAngle: articulated.getRotationAngle(),
+        worldMatrix: articulated.worldMatrix,
+        state: articulated.state,
       };
     } else {
       return {
@@ -528,6 +535,8 @@ function saveModel() {
         rotationAxis: articulated.rotationAxis,
         rotationLimit: articulated.rotationLimit,
         rotationAngle: articulated.getRotationAngle(),
+        worldMatrix: articulated.worldMatrix,
+        state: articulated.state,
       };
     }
   });
