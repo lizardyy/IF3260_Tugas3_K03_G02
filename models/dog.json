@@ -185,7 +185,7 @@
             22,
             23
           ],
-          "children" : [2, 3, 4, 5, 6],
+          "children" : [1,2, 3, 4, 5, 6],
           "rotationCoord": [0, 0, 0],
           "rotationAxis" : "y",
           "rotationLimit": [-5, 5],
