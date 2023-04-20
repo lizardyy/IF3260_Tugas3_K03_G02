@@ -43,6 +43,7 @@ var state = {
   bumpMapping :false,
   selectedComponent :-1,
   lightDirection :[1, 1, 1],
+
 }
 
 /* Dropdown Handler */
@@ -122,9 +123,11 @@ function changeState(state) {
   number = state.number;
   lightDirection = state.lightDirection;
 
-  console.log(state);
+  console.log(inputs);
 
   inputs[0].value = rotAngle[0];
+
+  console.log(inputs[0].value);
   inputs[1].value = rotAngle[1];
   inputs[2].value = rotAngle[2];
   inputs[3].value = rotAngle[3];
@@ -325,10 +328,12 @@ const hexToRgb = (hex) => {
 }
 
 function shaderModel(){
+  model[selectedComponent].state.shading = true;
   if (!shading){
     customMapping = false;
     reflectiveMapping = false;
     bumpMapping = false;
+    model[selectedComponent].state.shading = false;
   }
 }
 
@@ -341,6 +346,9 @@ document.getElementById("shading").addEventListener('change', changeShading, fal
 
 function changeAnimation(e) {
   animation = document.querySelector("#animation").checked;
+  if (animation) {
+    model[selectedComponent].state.animation = true;
+  }
 }
 
 document.getElementById("animation").addEventListener('change', changeAnimation, false);
@@ -349,6 +357,7 @@ function rotateModel(id, angle) {
   stopAnimation()
   if (id != 3){
     rotAngle[id] = toRadian(angle)
+    model[selectedComponent].state.rotAngle[id] = toRadian(angle)
   } else {
     model[selectedComponent].setRotationAngle(toRadian(angle))
     console.log(model[selectedComponent].getRotationAngle())
@@ -358,27 +367,32 @@ function rotateModel(id, angle) {
 function translateModel(id, value) {
   // stopAnimation()
   translation[id] = value
+  model[selectedComponent].state.translation[id] = value
 }
 
 function changeLightDirection(id, value) {
   lightDirection[id] = Number(value);
+  model[selectedComponent].state.lightDirection[id] = Number(value);
   console.log(lightDirection);
 }
 
 function scaleModel(id, value){
   // stopAnimation()
   scale[id] = value
+  model[selectedComponent].state.scale[id] = value
 }
 
 function changeAngle(value){
   stopAnimation()
   camAngle = toRadian(value)
+  model[selectedComponent].state.camAngle = toRadian(value)
   changeCameraPosition()
 }
 
 function changeRadius(value){
   stopAnimation()
   camRadius = value
+  model[selectedComponent].state.camRadius = value
   changeCameraPosition()
 }
 
