@@ -26,7 +26,7 @@ var shading = true;
 var customMapping = false;
 var reflectiveMapping = false;
 var bumpMapping = false;
-var selectedComponent =-1;
+var selectedComponent = -1;
 var lightDirection = [1, 1, 1];
 
 var state = {
@@ -41,7 +41,6 @@ var state = {
   customMapping :false,
   reflectiveMapping :false,
   bumpMapping :false,
-  selectedComponent :-1,
   lightDirection :[1, 1, 1],
 
 }
@@ -122,8 +121,6 @@ function changeState(state) {
   animation = state.animation;
   number = state.number;
   lightDirection = state.lightDirection;
-
-  console.log(inputs);
 
   inputs[0].value = rotAngle[0];
 
@@ -328,12 +325,14 @@ const hexToRgb = (hex) => {
 }
 
 function shaderModel(){
-  model[selectedComponent].state.shading = true;
   if (!shading){
     customMapping = false;
     reflectiveMapping = false;
     bumpMapping = false;
     model[selectedComponent].state.shading = false;
+  } else {
+    console.log(model[selectedComponent].state);
+    model[selectedComponent].state.shading = true;
   }
 }
 
@@ -408,7 +407,7 @@ function resetCameraView(){
   camRadius = 5
   defaultState()
   changeCameraPosition()
-  shaderModel(color)
+  shaderModel()
   changeProjection('perspective')
   
   // reset value of slider
@@ -503,16 +502,15 @@ function loadModel(){
       model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], fileread[i]["children"], fileread[i]["rotationCoord"], fileread[i]["rotationAxis"], fileread[i]["rotationLimit"], fileread[i]["rotationAngle"], worldMatrix, state))
     }
     generateTree()
+    const label = document.getElementById('part-rotate-label')
+    const value = document.getElementById('part-rotation-value');
+    const input = document.getElementById('part-rotation');
+    label.style.display = 'none';
+    value.style.display = 'none';
+    input.style.display = 'none';
+    selectedComponent = 0;
+    resetCameraView()
   }
-
-  const label = document.getElementById('part-rotate-label')
-  const value = document.getElementById('part-rotation-value');
-  const input = document.getElementById('part-rotation');
-  label.style.display = 'none';
-  value.style.display = 'none';
-  input.style.display = 'none';
-  selectedComponent = 0;
-  resetCameraView()
 }
 
 function saveModel() {
@@ -617,6 +615,7 @@ function selectComponent(idx) {
     partRotation.min = rotationLimit[0];
     partRotation.max = rotationLimit[1];
     console.log(model[selectedComponent].state)
+    selectedComponent = idx;
     changeState(model[selectedComponent].state)
 
   } else {
@@ -624,9 +623,6 @@ function selectComponent(idx) {
     value.style.display = 'none';
     input.style.display = 'none';
   }
-
-  // update the selected component after a delay of 0ms
-  selectedComponent = idx;
 }
 
 function changeMapping(type){
