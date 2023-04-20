@@ -125,9 +125,9 @@ function changeState(state) {
   number = state.number;
   lightDirection = state.lightDirection;
 
-  inputs[0].input.value = rotAngle[0];
-  inputs[1].input.value= rotAngle[1];
-  inputs[2].input.value= rotAngle[2];
+  inputs[0].input.value = rotAngle[0] * 180/Math.PI;
+  inputs[1].input.value = rotAngle[1] * 180 / Math.PI;
+  inputs[2].input.value = rotAngle[2] * 180 / Math.PI;
   inputs[3].input.value= rotAngle[3];
   inputs[4].input.value= scale[0];
   inputs[5].input.value= scale[1];
@@ -587,9 +587,9 @@ function selectComponent(idx) {
   const value = document.getElementById('part-rotation-value');
   const input = document.getElementById('part-rotation');
 
-  model[selectedComponent].vertices = mult(model[selectedComponent].getVertices(), transformMatrixComponent)
+  model[selectedComponent].transformMatrix = transformMatrixComponent
   for (i = 0; i < model[selectedComponent].children.length; i++){
-    model[model[selectedComponent].children[i]].vertices = mult(model[model[selectedComponent].children[i]].getVertices(), transformMatrixComponent)
+    model[model[selectedComponent].children[i]].transformMatrix = transformMatrixComponent
   }
   if (selectedComponent != -1) {
     // update the current selected component
@@ -607,6 +607,10 @@ function selectComponent(idx) {
     value.innerText = partRotation.value + '°';
     partRotation.min = rotationLimit[0];
     partRotation.max = rotationLimit[1];
+    if (model[selectedComponent].children.indexOf(idx) == -1) {
+      console.log("masuk")
+      model[idx].transformMatrix = worldMatrix
+    }
     selectedComponent = idx;
     changeState(model[idx].state); 
 
