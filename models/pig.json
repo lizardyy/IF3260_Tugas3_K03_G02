@@ -185,6 +185,8 @@
 			20,
 			22
 		],
+		"rotationCoord": [0.75, -1, -2.75],
+		"rotationAxis" : "y",
 		"rotationLimit": [-10, 10],
 		"rotationAngle": 0
 	},
@@ -374,6 +376,8 @@
 			20,
 			22
 		],
+		"rotationCoord": [0.75, -1, -2.75],
+		"rotationAxis" : "y",
 		"rotationLimit": [-10, 10],
 		"rotationAngle": 0
 	},
@@ -563,6 +567,8 @@
 			20,
 			22
 		],
+		"rotationCoord": [0.75, -1, -2.75],
+		"rotationAxis" : "y",
 		"rotationLimit": [-10, 10],
 		"rotationAngle": 0
 	},
@@ -704,6 +710,8 @@
 			20,
 			22
 		],
+		"rotationCoord": [0.75, -1, -2.75],
+		"rotationAxis" : "y",
 		"rotationLimit": [-10, 10],
 		"rotationAngle": 0
 	},
@@ -845,6 +853,8 @@
 			20,
 			22
 		],
+		"rotationCoord": [0.75, -1, -2.75],
+		"rotationAxis" : "y",
 		"rotationLimit": [-10, 10],
 		"rotationAngle": 0
 	},
@@ -986,6 +996,8 @@
 			20,
 			22
 		],
+		"rotationCoord": [0.75, -1, -2.75],
+		"rotationAxis" : "y",
 		"rotationLimit": [-10, 10],
 		"rotationAngle": 0
 	},
@@ -1127,6 +1139,8 @@
 			20,
 			22
 		],
+		"rotationCoord": [0.75, -1, -2.75],
+		"rotationAxis" : "y",
 		"rotationLimit": [-10, 10],
 		"rotationAngle": 0
 	}

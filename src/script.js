@@ -185,11 +185,16 @@ function render() {
     worldMatrix = transformMatrix.scale(worldMatrix, scale[0], scale[1], scale[2]);
     if (selectedComponent != -1){
       transformMatrixComponent = model[selectedComponent].getTransformMatrix()
-      // transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, translation[0], translation[1], translation[2]);
-      // transformMatrixComponent = transformMatrix.xRotate(transformMatrixComponent, rotAngle[0]);
-      transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
-      // transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, rotAngle[2]);
-      // transformMatrixComponent = transformMatrix.scale(transformMatrixComponent, scale[0], scale[1], scale[2]);
+
+      const rotationCoord = model[selectedComponent].getRotationCoord();
+      let xAxis = rotationCoord[0];
+      let yAxis = rotationCoord[1];
+      let zAxis = rotationCoord[2];
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
+      if (model[selectedComponent].getRotationAxis() == "x")  transformMatrixComponent = transformMatrix.xRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
+      else if (model[selectedComponent].getRotationAxis() == "y")transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
+      else if (model[selectedComponent].getRotationAxis() == "z")transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
+      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
     }
 
     gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
@@ -437,7 +442,7 @@ function loadModel(){
   reader.onload = function () {
     fileread = JSON.parse(reader.result);
     for (let i = 0; i < fileread.length; i++) {
-      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], fileread[i]["rotationLimit"], fileread[i]["rotationAngle"], worldMatrix))
+      model.push(new Articulated(fileread[i]["name"], fileread[i]["vertices"],fileread[i]["indices"], fileread[i]["rotationCoord"], fileread[i]["rotationAxis"], fileread[i]["rotationLimit"], fileread[i]["rotationAngle"], worldMatrix))
     }
     generateTree()
   }
@@ -459,6 +464,8 @@ function saveModel() {
         name: articulated.name,
         vertices: mult(articulated.getVertices(), transformMatrixComponent),
         indices: articulated.indices,
+        rotationCoord: articulated.rotationCoord,
+        rotationAxis: articulated.rotationAxis,
         rotationLimit: articulated.rotationLimit,
         rotationAngle: articulated.getRotationAngle(),
       };
@@ -467,6 +474,8 @@ function saveModel() {
         name: articulated.name,
         vertices: mult(articulated.getVertices(), articulated.getTransformMatrix()),
         indices: articulated.indices,
+        rotationCoord: articulated.rotationCoord,
+        rotationAxis: articulated.rotationAxis,
         rotationLimit: articulated.rotationLimit,
         rotationAngle: articulated.getRotationAngle(),
       };

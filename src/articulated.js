@@ -2,10 +2,12 @@ class Articulated {
 
     // tambahin aja ntar
 
-    constructor(name, vertices, indices, rotationLimit, rotationAngle, transformMatrix) {
+    constructor(name, vertices, indices, rotationCoord, rotationAxis, rotationLimit, rotationAngle, transformMatrix) {
         this.name = name
         this.vertices = vertices;
         this.indices = indices;
+        this.rotationCoord = rotationCoord
+        this.rotationAxis = rotationAxis
         this.rotationLimit = rotationLimit
         this.rotationAngle = 0
         this.transformMatrix = transformMatrix
@@ -20,6 +22,10 @@ class Articulated {
     getIndicesLength() { return this.indices.length; }
 
     getName() { return this.name; }
+
+    getRotationCoord() { return this.rotationCoord; }
+
+    getRotationAxis() { return this.rotationAxis; }
 
     getRotationLimit() { return this.rotationLimit; }
 
