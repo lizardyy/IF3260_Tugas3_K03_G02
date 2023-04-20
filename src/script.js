@@ -15,12 +15,11 @@ var transformMatrixComponent
 var textureBuffer
 var normalBuffer
 
-var rotAngle = [0,0,0]
+var rotAngle = [0,0,0,0]
 var translation = [0,0,0];
 var scale = [1, 1, 1];
 var camAngle = 0;
 var camRadius = 5;
-var color = [0.2 ,0.1 , 0.4];
 var animation = false;
 var number = 0;
 var shading = true;
@@ -31,12 +30,11 @@ var selectedComponent =-1;
 var lightDirection = [1, 1, 1];
 
 var state = {
-  rotAngle :[0, 0, 0],
+  rotAngle :[0, 0, 0,0],
   translation :[0, 0, 0],
   scale :[1, 1, 1],
   camAngle :0,
   camRadius :5,
-  color :[0.2, 0.1, 0.4],
   animation :false,
   number :0,
   shading :true,
@@ -45,8 +43,8 @@ var state = {
   bumpMapping :false,
   selectedComponent :-1,
   lightDirection :[1, 1, 1],
-
 }
+
 /* Dropdown Handler */
 function toggleDropdown(dropdownId) {
     var dropdowns = document.querySelectorAll('.dropdown.show');
@@ -122,11 +120,25 @@ function changeState(state) {
   color = state.color;
   animation = state.animation;
   number = state.number;
+  lightDirection = state.lightDirection;
 
-  inputs.forEach(function (item) {
-    item.input.value = item.input.defaultValue;
-    item.value.innerText = item.input.defaultValue + item.unit;
-  })
+  console.log(state);
+
+  inputs[0].value = rotAngle[0];
+  inputs[1].value = rotAngle[1];
+  inputs[2].value = rotAngle[2];
+  inputs[3].value = rotAngle[3];
+  inputs[4].value = scale[0];
+  inputs[5].value = scale[1];
+  inputs[6].value = scale[2];
+  inputs[7].value = translation[0];
+  inputs[8].value = translation[1];
+  inputs[9].value = translation[2];
+  inputs[10].value = camAngle;
+  inputs[11].value = camRadius;
+  inputs[12].value = lightDirection[0];
+  inputs[13].value = lightDirection[1];
+  inputs[14].value = lightDirection[2];
 }
 
 /* Initialize */
@@ -233,39 +245,28 @@ function render() {
       if (model[selectedComponent].getRotationAxis() == "x")  transformMatrixComponent = transformMatrix.xRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
       else if (model[selectedComponent].getRotationAxis() == "y")transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
       else if (model[selectedComponent].getRotationAxis() == "z")transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, model[selectedComponent].getRotationAngle());
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
-      // transformMatrixComponent = model[selectedComponent].getTransformMatrix()
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
       transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, translation[0], translation[1], translation[2]);
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
       transformMatrixComponent = transformMatrix.xRotate(transformMatrixComponent, rotAngle[0]);
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
       transformMatrixComponent = transformMatrix.yRotate(transformMatrixComponent, rotAngle[1]);
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
       transformMatrixComponent = transformMatrix.zRotate(transformMatrixComponent, rotAngle[2]);
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
-      transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, xAxis, yAxis, zAxis);
       transformMatrixComponent = transformMatrix.scale(transformMatrixComponent, scale[0], scale[1], scale[2]);
       transformMatrixComponent = transformMatrix.translate(transformMatrixComponent, -xAxis, -yAxis, -zAxis);
       // Iterate the children
-      let transformMatrixComponentChildArray = [];
-      for (let i=0;i<children.length;i++){
-        const idx = children[i];
-        let transformMatrixComponentChild = model[idx].getTransformMatrix()
-        const rotationCoordChild = model[idx].getRotationCoord();
-        xAxis = rotationCoordChild[0];
-        yAxis = rotationCoordChild[1];
-        zAxis = rotationCoordChild[2];
-        transformMatrixComponentChild  = transformMatrix.translate(transformMatrixComponentChild , xAxis, yAxis, zAxis);
-        if (model[selectedComponent].getRotationAxis() == "x")  transformMatrixComponentChild  = transformMatrix.xRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
-        else if (model[selectedComponent].getRotationAxis() == "y")transformMatrixComponentChild  = transformMatrix.yRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
-        else if (model[selectedComponent].getRotationAxis() == "z")transformMatrixComponentChild  = transformMatrix.zRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
-        transformMatrixComponentChild  = transformMatrix.translate(transformMatrixComponentChild , -xAxis, -yAxis, -zAxis);
-        transformMatrixComponentChildArray.push(transformMatrixComponentChild);
-      }
+      // let transformMatrixComponentChildArray = [];
+      // for (let i=0;i<children.length;i++){
+      //   const idx = children[i];
+      //   let transformMatrixComponentChild = model[idx].getTransformMatrix()
+      //   const rotationCoordChild = model[idx].getRotationCoord();
+      //   xAxis = rotationCoordChild[0];
+      //   yAxis = rotationCoordChild[1];
+      //   zAxis = rotationCoordChild[2];
+      //   transformMatrixComponentChild  = transformMatrix.translate(transformMatrixComponentChild , xAxis, yAxis, zAxis);
+      //   if (model[selectedComponent].getRotationAxis() == "x")  transformMatrixComponentChild  = transformMatrix.xRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
+      //   else if (model[selectedComponent].getRotationAxis() == "y")transformMatrixComponentChild  = transformMatrix.yRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
+      //   else if (model[selectedComponent].getRotationAxis() == "z")transformMatrixComponentChild  = transformMatrix.zRotate(transformMatrixComponentChild , model[selectedComponent].getRotationAngle());
+      //   transformMatrixComponentChild  = transformMatrix.translate(transformMatrixComponentChild , -xAxis, -yAxis, -zAxis);
+      //   transformMatrixComponentChildArray.push(transformMatrixComponentChild);
+      // }
     }
     if (selectedComponent == -1) {
       gl.uniformMatrix4fv(matWorldLocation, gl.FALSE, worldMatrix);
@@ -323,50 +324,17 @@ const hexToRgb = (hex) => {
   return [r, g, b];
 }
 
-function shaderModel(color){
+function shaderModel(){
   if (!shading){
     customMapping = false;
     reflectiveMapping = false;
     bumpMapping = false;
   }
-  // let r = color[0]
-  // let g = color[1]
-  // let b = color[2]
-
-  // // if (shading){
-  // //   for (var i = 0; i < model.length; i++){
-  // //     var sides = 6;
-  // //     if (number == 1){
-  // //       sides = 5;
-  // //     }
-  // //     var color = [0.0, 0.0, 0.0];
-  // //     for (var j = 3; j < model[i].length; j+=6){
-  // //       if (j < sides * 24){
-  // //         color = [(0.3+r)/1.4,(0.3+g)/1.4,(0.3+b)/1.4];
-  // //       } else if (j >= sides * 24 && j < sides * 2 * 24){
-  // //         color = [r/1.3,g/1.3,b/1.3];
-  // //       } else {
-  // //         color = [r,g,b];
-  // //       }
-  // //       model[i][j] = color[0];
-  // //       model[i][j+1] = color[1];
-  // //       model[i][j+2] = color[2];
-  // //     }
-  // //   }
-  // // } else {
-  // //   for (var i = 0; i < model.length; i++){
-  // //     for (var j = 3; j < model[i].length; j+=6){
-  // //       model[i][j] = r;
-  // //       model[i][j+1] = g;
-  // //       model[i][j+2] = b;
-  // //     }
-  // //   }
-  // // }
 }
 
 function changeShading(e) {
   shading = document.querySelector("#shading").checked;
-  shaderModel(color);
+  shaderModel();
 }
 
 document.getElementById("shading").addEventListener('change', changeShading, false);
@@ -529,7 +497,7 @@ function loadModel(){
   label.style.display = 'none';
   value.style.display = 'none';
   input.style.display = 'none';
-  selectedComponent = 0
+  selectedComponent = 0;
   resetCameraView()
 }
 
@@ -634,6 +602,7 @@ function selectComponent(idx) {
     value.innerText = partRotation.value + '°';
     partRotation.min = rotationLimit[0];
     partRotation.max = rotationLimit[1];
+    console.log(model[selectedComponent].state)
     changeState(model[selectedComponent].state)
 
   } else {
