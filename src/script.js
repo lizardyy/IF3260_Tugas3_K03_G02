@@ -7,7 +7,10 @@ var lightDirectionLocation
 var shadingLocation
 var textureLocation
 var worldCameraLocation
+var timeLocation
+var resolutionLocation
 var normalLocation
+var bumpScaleLocation
 var viewMatrix
 var projMatrix
 var mIdentity
@@ -152,6 +155,7 @@ window.onload = function init() {
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
+  gl.getExtension("OES_standard_derivatives");
 
   program = initShaders(gl, "vertex-shader", "fragment-shader");
   
@@ -188,6 +192,9 @@ window.onload = function init() {
   bumpMappingLocation = gl.getUniformLocation(program, 'bumpMapping');
   textureLocation = gl.getUniformLocation(program, 'uTexture');
   worldCameraLocation = gl.getUniformLocation(program, 'uWorldCameraPosition');
+  timeLocation = gl.getUniformLocation(program, 'time');
+  resolutionLocation = gl.getUniformLocation(program, 'resolution');
+  bumpScaleLocation = gl.getUniformLocation(program, 'uBumpScale');
 
   // worldMatrix = new Float32Array(16);
   viewMatrix = new Float32Array(16);
@@ -213,8 +220,12 @@ window.onload = function init() {
   render();
 }
 
+var previousTime = 0;
+
 /* Render */
-function render() {
+function render(currentTime) {
+  const deltaTime = (currentTime - previousTime) / 1000;
+  previousTIMe = currentTime;
   mIdentity = new Float32Array(16);
   identity(mIdentity);
   var loop = () => {
@@ -283,6 +294,9 @@ function render() {
     gl.uniform1i(reflectiveMappingLocation, reflectiveMapping);
     gl.uniform1i(bumpMappingLocation, bumpMapping);
     gl.uniform3fv(lightDirectionLocation, lightDirection);
+    gl.uniform1f(timeLocation, currentTime);
+    gl.uniform2f(resolutionLocation, gl.canvas.width, gl.canvas.height);
+    gl.uniform1f(bumpScaleLocation, 100);
 
     gl.clearColor(0.125, 0.125, 0.118, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -631,7 +645,10 @@ function selectComponent(idx) {
 
 function changeMapping(type){
   if (type == 'bump'){
-    
+    customMapping = false;
+    reflectiveMapping = false;
+    bumpMapping = true;
+    setBumpMapping()
   } else if (type == 'reflective') {
     customMapping = false;
     reflectiveMapping = true;
@@ -664,6 +681,58 @@ function setCustomMapping(){
     },
     {
       target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: '../texture/texture2.jpeg',
+    },
+  ];
+
+  faceInfos.forEach((faceInfo) => {
+    const {target, url} = faceInfo;
+  
+    // Upload canvas ke cubemap
+    const level = 0;
+    const internalFormat = gl.RGBA;
+    const width = 512;
+    const height = 512;
+    const format = gl.RGBA;
+    const type = gl.UNSIGNED_BYTE;
+    
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, textureBuffer);
+    gl.texImage2D(target, level, internalFormat, width, height, 0, format, type, null);
+  
+    // Load image
+    const image = new Image();
+    image.src = url;
+    image.addEventListener('load', function() {
+      // Upload ke texture.
+      
+      gl.texImage2D(target, level, internalFormat, format, type, image);
+      gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+    });
+
+  });
+
+  gl.generateMipmap(gl.TEXTURE_CUBE_MAP);
+  gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+}
+
+function setBumpMapping(){
+  const faceInfos = [
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_X, url: '../texture/bump_normal.png',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_X, url: '../texture/bump_normal.png',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_Y, url: '../texture/bump_normal.png',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, url: '../texture/bump_normal.png',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_POSITIVE_Z, url: '../texture/bump_normal.png',
+    },
+    {
+      target: gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, url: '../texture/bump_normal.png',
     },
   ];
 
